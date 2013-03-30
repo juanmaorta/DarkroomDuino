@@ -76,14 +76,20 @@ void setup() {
   for (int i=0; i < NUM_BUTTONS; i++) {
     pinMode(buttons[i], INPUT);
   }
+  Serial.begin(9600);
 }
 
 void loop() {
   int key = scanKeyboard();
   
   if (key > NO_KEY) {
-    blink(key);
+    if (key == KEY_CANCEL) {
+      Serial.println("Cancela!");
+    } else {
+      blink(key);
+    }
   }
+    
 }
 
 int scanKeyboard() {
@@ -98,12 +104,13 @@ int scanKeyboard() {
 }
 
 void blink(int times) {
-    // Serial.println("Pulsado boton " + times); 
-    for (int i = 0; i < times; i++) {
+    Serial.print("Pulsado boton: ");
+    Serial.println(times);
+    // for (int i = 0; i < times; i++) {
        digitalWrite(ledPin, HIGH);
        delay(200);
        digitalWrite(ledPin, LOW);
        delay(200);
-    }
+    // }
      // pressed = false;
 }
