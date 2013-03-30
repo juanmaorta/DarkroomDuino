@@ -53,17 +53,20 @@ const int buttons[] = {
 
 const int ledPin =  13;      // the number of the LED pin
 
+// Keycodes
+#define NO_KEY               0 // No keys pressed
+#define KEY_MODE             1 // Mode button pressed
+#define KEY_LEFT             2 // Left button pressed
+#define KEY_UP               3 // Up button pressed
+#define KEY_DOWN             4 // Down button pressed
+#define KEY_RIGHT            5 // Right button pressed
+#define KEY_CANCEL           6 // Cancel button pressed
+#define KEY_FOCUS            7 // Focus pressed
+#define KEY_GO               8 // Go button pressed
+
 // Variables will change:
 int ledState = HIGH;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
-int lastButtonState = LOW;   // the previous reading from the input pin
-
-// the following variables are long's because the time, measured in miliseconds,
-// will quickly become a bigger number than can be stored in an int.
-long lastDebounceTime = 0;  // the last time the output pin was toggled
-long debounceDelay = 50;    // the debounce time; increase if the output flickers
-
-int reading = LOW;
 
 void setup() {
   // initialize the LED pin as an output:
@@ -76,50 +79,31 @@ void setup() {
 }
 
 void loop() {
-  // read the state of the pushbutton value:
-  for (int i = 0; i < NUM_BUTTONS; i++) {
-    buttonState = digitalRead(buttons[i]);
+  int key = scanKeyboard();
   
-    // check if the pushbutton is pressed.
-    // if it is, the buttonState is HIGH:
-    if (buttonState == HIGH) {     
-      // turn LED on:    
-      digitalWrite(ledPin, HIGH);
-      delay(200);
-      digitalWrite(ledPin, LOW);
-      break;
-    }
+  if (key > NO_KEY) {
+    blink(key);
   }
 }
 
-/*
 int scanKeyboard() {
   int key = 0;
   for (int i= 0; i < NUM_BUTTONS; i++) {
-    
     buttonState = digitalRead(buttons[i]);
-    Serial.print(buttonSt);
     if (buttonState == 1) {
-      // pressed = true;
-      // digitalWrite(ledPin, HIGH);
-      // delay(200);
-      // digitalWrite(ledPin, LOW);
       key = i+1;
-      // break;
     }
   }
-  
   return key;
 }
 
 void blink(int times) {
     // Serial.println("Pulsado boton " + times); 
-    // for (int i = 0; i < times; i++) {
+    for (int i = 0; i < times; i++) {
        digitalWrite(ledPin, HIGH);
        delay(200);
        digitalWrite(ledPin, LOW);
-       // delay(200);
-     // }
+       delay(200);
+    }
      // pressed = false;
 }
-*/
