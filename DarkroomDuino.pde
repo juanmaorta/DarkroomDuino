@@ -1,28 +1,6 @@
-  /*
-  Button
- 
- Turns on and off a light emitting diode(LED) connected to digital  
- pin 13, when pressing a pushbutton attached to pin 2. 
- 
- 
- The circuit:
- * LED attached from pin 13 to ground 
- * pushbutton attached to pin 2 from +5V
- * 10K resistor attached to pin 2 from ground
- 
- * Note: on most Arduinos there is already an LED on the board
- attached to pin 13.
- 
- 
- created 2005
- by DojoDave <http://www.0j0.org>
- modified 28 Oct 2010
- by Tom Igoe
- 
- This example code is in the public domain.
- 
- http://www.arduino.cc/en/Tutorial/Button
- */
+#include <Wire.h>
+#include <LCDI2C4Bit.h>
+
 
 // constants won't change. They're used here to 
 // set pin numbers:
@@ -64,11 +42,25 @@ const int ledPin =  13;      // the number of the LED pin
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_GO               8 // Go button pressed
 
+// Execution modes
+#define NO_MODE              0 // No mode selected
+#define F_STOP_STRIP         1 // F-Stop strip test
+
 // Variables will change:
 int ledState = HIGH;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
+int cur_mode = NO_MODE;
+
+// LCD
+int ADDR = 0xA7;
+byte x = 0;
+byte data = 1;
+byte c;
+LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
 void setup() {
+  Wire.begin(); // join i2c bus (address optional for master)
+  
   // initialize the LED pin as an output:
   pinMode(ledPin, OUTPUT);
   
@@ -76,20 +68,63 @@ void setup() {
   for (int i=0; i < NUM_BUTTONS; i++) {
     pinMode(buttons[i], INPUT);
   }
-  Serial.begin(9600);
+  
+  lcd.init();
+  lcd.backLight(true);
+  lcd.clear();
+  
+  lcd.cursorTo(0,0);
+  lcd.printIn("DkroomDuino 0.1");
+  lcd.cursorTo(2,0);
+  lcd.printIn("Bienvenido!");
+  delay(2000);
+  lcd.clear();
+  lcd.cursorTo(0,0);
+  lcd.printIn("Pulsa una tecla");
+  lcd.cursorTo(2,0);
+  // Serial.begin(9600);
 }
 
 void loop() {
   int key = scanKeyboard();
+  // char[] msg = "";
   
   if (key > NO_KEY) {
-    if (key == KEY_CANCEL) {
-      Serial.println("Cancela!");
-    } else {
-      blink(key);
+    LcdClearLine(2);
+    lcd.cursorTo(2,0);
+
+    switch (key) {
+      case KEY_CANCEL:
+        cancel();
+        break;
+      case KEY_MODE:
+        modo();
+        break;
+      case KEY_LEFT:
+        lcd.printIn("Left");
+        break;
+      case KEY_UP:
+        lcd.printIn("Up");
+        break;
+      case KEY_DOWN:
+        lcd.printIn("Down");
+        break;
+      case KEY_RIGHT:
+        lcd.printIn("Right");
+        break;
+      case KEY_FOCUS:
+        lcd.printIn("Focus");
+        break;
+      case KEY_GO:
+        lcd.printIn("Go!");
+        break;
     }
   }
-    
+  
+  if (cur_mode != 0) {
+    // LcdClearLine(2);
+    // lcd.cursorTo(2,0);
+  }
 }
 
 int scanKeyboard() {
@@ -104,8 +139,8 @@ int scanKeyboard() {
 }
 
 void blink(int times) {
-    Serial.print("Pulsado boton: ");
-    Serial.println(times);
+    // Serial.print("Pulsado boton: ");
+    // Serial.println(times);
     // for (int i = 0; i < times; i++) {
        digitalWrite(ledPin, HIGH);
        delay(200);
@@ -113,4 +148,28 @@ void blink(int times) {
        delay(200);
     // }
      // pressed = false;
+}
+
+void LcdClearLine(int r) {
+  lcd.cursorTo(r,0);
+  for (int i = 0; i < 16; i++) {
+    lcd.printIn(" ");
+  }
+}
+
+void modo() {
+  LcdClearLine(0);
+  lcd.cursorTo(0,0);
+  lcd.printIn("Modo");
+  cur_mode = F_STOP_STRIP;
+  LcdClearLine(2);
+  lcd.cursorTo(2,0);
+  lcd.printIn("2 4 8 16 32 64");
+}
+
+void cancel() {
+  LcdClearLine(2);
+  lcd.cursorTo(2,0);  
+  lcd.printIn("Cancelando ...");
+  delay(1000);
 }
