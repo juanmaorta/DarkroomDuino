@@ -29,7 +29,7 @@ const int buttons[] = {
 // number of buttons
 #define NUM_BUTTONS             8
 
-const int ledPin =  13;      // the number of the LED pin
+const int RELAY_PIN =  13;      // the number of the LED pin
 
 // Keycodes
 #define NO_KEY               0 // No keys pressed
@@ -62,7 +62,7 @@ void setup() {
   Wire.begin(); // join i2c bus (address optional for master)
   
   // initialize the LED pin as an output:
-  pinMode(ledPin, OUTPUT);
+  pinMode(RELAY_PIN, OUTPUT);
   
   // initialize the pushbutton pin as an input:
   for (int i=0; i < NUM_BUTTONS; i++) {
@@ -113,7 +113,7 @@ void loop() {
         lcd.printIn("Right");
         break;
       case KEY_FOCUS:
-        lcd.printIn("Focus");
+        focus();
         break;
       case KEY_GO:
         lcd.printIn("Go!");
@@ -142,9 +142,9 @@ void blink(int times) {
     // Serial.print("Pulsado boton: ");
     // Serial.println(times);
     // for (int i = 0; i < times; i++) {
-       digitalWrite(ledPin, HIGH);
+       digitalWrite(RELAY_PIN, HIGH);
        delay(200);
-       digitalWrite(ledPin, LOW);
+       digitalWrite(RELAY_PIN, LOW);
        delay(200);
     // }
      // pressed = false;
@@ -155,6 +155,21 @@ void LcdClearLine(int r) {
   for (int i = 0; i < 16; i++) {
     lcd.printIn(" ");
   }
+}
+
+void focus() {
+  // light_on
+  lcd.printIn("Focus");
+  digitalWrite(RELAY_PIN, HIGH);
+  /*
+  if (light_on) {
+    digitalWrite(RELAY_PIN, HIGH);
+    light_on = false;
+  } else {
+    digitalWrite(RELAY_PIN, HIGH);
+    light_on = true;
+  }
+  */
 }
 
 void modo() {
@@ -171,5 +186,6 @@ void cancel() {
   LcdClearLine(2);
   lcd.cursorTo(2,0);  
   lcd.printIn("Cancelando ...");
+  digitalWrite(RELAY_PIN, LOW);
   delay(1000);
 }
