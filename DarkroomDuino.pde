@@ -17,24 +17,18 @@
 #define PINS_BTN_FOCUS          7  //(digital pin)
 #define PINS_BTN_GO             8  //(digital pin)
 
-const int button_pins[] = {
-  PINS_BTN_MODE,
-  PINS_BTN_LEFT,
-  PINS_BTN_UP,
-  PINS_BTN_DOWN,
-  PINS_BTN_RIGHT,
-  PINS_BTN_CANCEL,
-  PINS_BTN_FOCUS,
-  PINS_BTN_GO
-};
+
+int button_pins[7] = { PINS_BTN_LEFT,PINS_BTN_UP,PINS_BTN_DOWN,PINS_BTN_RIGHT,PINS_BTN_CANCEL,PINS_BTN_FOCUS,PINS_BTN_GO };
+int num_buttons = 7;
 
 // number of buttons
-#define NUM_BUTTONS             8
+#define NUM_BUTTONS             7
 
 const int RELAY_PIN =  11;      // the number of the LED pin
 const int BUZZER_PIN =  12;      // the number of the LED pin
 const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 
+/*
 // Keycodes
 #define NO_KEY               0 // No keys pressed
 #define KEY_MODE             1 // Mode button pressed
@@ -51,9 +45,14 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define F_STOP_STRIP         1 // F-Stop strip test
 
 // Variables will change:
-int relayState = LOW;         // the current state of the output pin
+
 int buttonState;             // the current reading from the input pin
 int cur_mode = NO_MODE;
+*/
+
+int relayState = LOW;         // the current state of the output pin
+
+int baseTime = 16000;        // initial base time (ms)
 
 // LCD
 int ADDR = 0xA7;
@@ -63,31 +62,35 @@ byte c;
 
 LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
-// button test
-Button button = Button(PINS_BTN_FOCUS,PULLDOWN);
+
+
+/*
+for (int i=0; i< button_pins.size(); i++) {
+  
+}
+*/
+
+Button focus_btn = Button(PINS_BTN_FOCUS,PULLDOWN);
+Button cancel_btn = Button(PINS_BTN_CANCEL,PULLDOWN);
 
 void setup() {
   Wire.begin(); // join i2c bus (address optional for master)
-  
+ 
   // initialize output pins
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
-  
-  // initialize the pushbutton pin as an input:
-  for (int i=0; i < NUM_BUTTONS; i++) {
-    // pinMode(buttons[i], INPUT);
-  }
-  
+
   lcd.init();
   lcd.backLight(true);
   lcd.clear();
-  
+
+  // Welcome message and beeps  
   lcd.cursorTo(0,0);
   lcd.printIn("DkroomDuino 0.1");
   lcd.cursorTo(2,0);
   lcd.printIn("Bienvenido!");
   delay(1820);
-  // welcome beeps
+
   digitalWrite(BUZZER_PIN, HIGH);
   delay(40);
   digitalWrite(BUZZER_PIN, LOW);
@@ -95,29 +98,19 @@ void setup() {
   digitalWrite(BUZZER_PIN, HIGH);
   delay(40);
   digitalWrite(BUZZER_PIN, LOW);
-  // delay(1620);
   
   lcd.clear();
-  // lcd.cursorTo(0,0);
-  // lcd.printIn("Pulsa una tecla");
-  // lcd.cursorTo(2,0);
-  // Serial.begin(9600);
 }
 
 void loop() {
-  if(button.uniquePress()){
-    digitalWrite(BUZZER_PIN, HIGH);
-    delay(CLICK_LENGTH);
-    digitalWrite(BUZZER_PIN, LOW);
-    
-    if (relayState == LOW) {
-      digitalWrite(RELAY_PIN,HIGH);
-      relayState = HIGH;
-    } else {
-       digitalWrite(RELAY_PIN,LOW);
-      relayState = LOW;
-    }
+  if(focus_btn.uniquePress()){
+    focus();
   }
+  
+  if(cancel_btn.uniquePress()){
+    cancel();
+  }
+  
   /*
   int key = scanKeyboard();
   // char[] msg = "";
@@ -161,6 +154,43 @@ void loop() {
   */
 }
 
+void focus() {
+    btn_click();
+    if (relayState == LOW) {
+      digitalWrite(RELAY_PIN,HIGH);
+      relayState = HIGH;
+      LcdClearLine(0);
+      lcd.cursorTo(0,0);
+      lcd.printIn("Focus");
+    } else {
+      digitalWrite(RELAY_PIN,LOW);
+      LcdClearLine(0);
+      relayState = LOW;
+    } 
+}
+
+
+
+void cancel() {
+  // btn_click(); 
+  LcdClearLine(0);   
+  digitalWrite(RELAY_PIN,LOW);
+  if (relayState == HIGH) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(40);
+    digitalWrite(BUZZER_PIN, LOW);
+  } else {
+    btn_click(); 
+  }
+  relayState = LOW;
+}
+
+void btn_click() {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(CLICK_LENGTH);
+    digitalWrite(BUZZER_PIN, LOW);  
+}
+
 int scanKeyboard() {
   /*
   int key = 0;
@@ -181,22 +211,8 @@ void LcdClearLine(int r) {
   }
 }
 
-void focus() {
-  // light_on
-  lcd.printIn("Focus");
-  digitalWrite(RELAY_PIN, HIGH);
-  /*
-  if (light_on) {
-    digitalWrite(RELAY_PIN, HIGH);
-    light_on = false;
-  } else {
-    digitalWrite(RELAY_PIN, HIGH);
-    light_on = true;
-  }
-  */
-}
-
 void modo() {
+  /*
   LcdClearLine(0);
   lcd.cursorTo(0,0);
   lcd.printIn("Modo");
@@ -204,12 +220,5 @@ void modo() {
   LcdClearLine(2);
   lcd.cursorTo(2,0);
   lcd.printIn("2 4 8 16 32 64");
-}
-
-void cancel() {
-  LcdClearLine(2);
-  lcd.cursorTo(2,0);  
-  lcd.printIn("Cancelando ...");
-  digitalWrite(RELAY_PIN, LOW);
-  delay(1000);
+  */
 }
