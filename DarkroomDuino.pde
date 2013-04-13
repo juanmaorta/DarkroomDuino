@@ -1,5 +1,5 @@
+#include <FiniteStateMachine.h>
 #include <Button.h>
-
 #include <Wire.h>
 #include <LCDI2C4Bit.h>
 
@@ -21,11 +21,22 @@
 int button_pins[5] = { PINS_BTN_UP, PINS_BTN_DOWN, PINS_BTN_MODE, PINS_BTN_FOCUS, PINS_BTN_GO };
 int num_buttons = 5;
 
+// FSM
+const int NUMBER_OF_STATES = 5;
+// initialize states
+State Idle = State(idle);
+State Focus = State(focus);
+State Expose = State(expose);
+State IncreaseTime = State(increaseTime);
+State DecreaseTime = State(decreaseTime);
+
+// initializa state machine
+FSM StateMachine = FSM(Idle);     //initialize state machine, start in state: On
+
 
 const int RELAY_PIN =  11;      // the number of the LED pin
 const int BUZZER_PIN =  12;      // the number of the LED pin
 const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
-
 
 // Keycodes
 #define NO_KEY               0 // No keys pressed
