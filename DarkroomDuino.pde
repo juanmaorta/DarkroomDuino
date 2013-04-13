@@ -38,17 +38,18 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
 
-/*
 // Execution modes
-#define NO_MODE              0 // No mode selected
-#define F_STOP_STRIP         1 // F-Stop strip test
+#define MODE_NONE     0 // No mode selected
+#define MODE_FOCUS    1 // Focus
+#define MODE_EXPOSE   2 // Expose
+
+int cur_mode = MODE_NONE;
 
 // Variables will change:
 
-int buttonState;             // the current reading from the input pin
-int cur_mode = NO_MODE;
-*/
-int welcome_beep = true;
+// int buttonState;             // the current reading from the input pin
+
+int welcome_beep = false;
 int relayState = LOW;         // the current state of the output pin
 
 int baseTime = 16;        // initial base time (ms)
@@ -102,48 +103,60 @@ void setup() {
 }
 
 void loop() {
-   int key = scanKeyboard();
-  if (key == 0) {
-      // LcdClearLine(2);
-      lcd.cursorTo(2,7);
-      char c[20];
-      
-      sprintf(c, "%3d.0 sec", baseTime);
-      
-      lcd.printIn(c); 
+  int key = scanKeyboard();
+  if (key == 0 && cur_mode == MODE_NONE) {
+      LcdPrintTime(baseTime);
+  }
+  if (key == KEY_EXPOSE) {
+     expose();
   }
 }
 
 void focus() {
     btn_click();
-    if (relayState == LOW) {
-      digitalWrite(RELAY_PIN,HIGH);
-      relayState = HIGH;
-      LcdClearLine(0);
-      lcd.cursorTo(0,0);
-      lcd.printIn("Focus");
-       LcdClearLine(2);
-    } else {
-      digitalWrite(RELAY_PIN,LOW);
-      LcdClearLine(0);
-      relayState = LOW;
-    } 
+    if (cur_mode == MODE_NONE || cur_mode == MODE_FOCUS) {
+      if (relayState == LOW) {
+        cur_mode = MODE_FOCUS;
+        digitalWrite(RELAY_PIN,HIGH);
+        relayState = HIGH;
+        LcdClearLine(0);
+        lcd.cursorTo(0,0);
+        lcd.printIn("Focus");
+         LcdClearLine(2);
+      } else {
+        cur_mode = MODE_NONE;
+        digitalWrite(RELAY_PIN,LOW);
+        LcdClearLine(0);
+        relayState = LOW;
+      }
+    }
 }
 
 void expose() {
+  int cur_time = baseTime; 
+  LcdPrintTime(cur_time);
+}
+
+void set_expose_mode() {
     btn_click();
-    if (relayState == LOW) {
-      digitalWrite(RELAY_PIN,HIGH);
-      relayState = HIGH;
-      LcdClearLine(0);
-      lcd.cursorTo(0,0);
-      lcd.printIn("Expose");
-    } else {
-      digitalWrite(RELAY_PIN,LOW);
-      LcdClearLine(0);
-      LcdClearLine(2);
-      relayState = LOW;
-    } 
+    if (cur_mode == MODE_NONE || cur_mode == MODE_EXPOSE) {
+      
+      if (relayState == LOW) {
+        cur_mode = MODE_EXPOSE;
+        digitalWrite(RELAY_PIN,HIGH);
+        relayState = HIGH;
+        LcdClearLine(0);
+        lcd.cursorTo(0,0);
+        lcd.printIn("Expose");
+
+      } else {
+        cur_mode = MODE_NONE;
+        digitalWrite(RELAY_PIN,LOW);
+        LcdClearLine(0);
+        LcdClearLine(2);
+        relayState = LOW;
+      }
+    }
 }
 
 void cancel() {
@@ -174,7 +187,7 @@ int scanKeyboard() {
   }
   
   if(expose_btn.uniquePress()){
-    expose();
+    set_expose_mode();
     key = KEY_EXPOSE;
   }
   
@@ -200,6 +213,13 @@ void LcdClearLine(int r) {
   for (int i = 0; i < 16; i++) {
     lcd.printIn(" ");
   }
+}
+
+void LcdPrintTime(int time) {
+      lcd.cursorTo(2,7);
+      char c[20];
+      sprintf(c, "%3d.0 sec", time);
+      lcd.printIn(c); 
 }
 
 void up() {
