@@ -18,17 +18,15 @@
 #define PINS_BTN_GO             8  //(digital pin)
 
 
-int button_pins[7] = { PINS_BTN_LEFT,PINS_BTN_UP,PINS_BTN_DOWN,PINS_BTN_RIGHT,PINS_BTN_CANCEL,PINS_BTN_FOCUS,PINS_BTN_GO };
-int num_buttons = 7;
+int button_pins[5] = { PINS_BTN_UP, PINS_BTN_DOWN, PINS_BTN_MODE, PINS_BTN_FOCUS, PINS_BTN_GO };
+int num_buttons = 5;
 
-// number of buttons
-#define NUM_BUTTONS             7
 
 const int RELAY_PIN =  11;      // the number of the LED pin
 const int BUZZER_PIN =  12;      // the number of the LED pin
 const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 
-/*
+
 // Keycodes
 #define NO_KEY               0 // No keys pressed
 #define KEY_MODE             1 // Mode button pressed
@@ -38,8 +36,9 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define KEY_RIGHT            5 // Right button pressed
 #define KEY_CANCEL           6 // Cancel button pressed
 #define KEY_FOCUS            7 // Focus pressed
-#define KEY_GO               8 // Go button pressed
+#define KEY_EXPOSE           8 // Expose button pressed
 
+/*
 // Execution modes
 #define NO_MODE              0 // No mode selected
 #define F_STOP_STRIP         1 // F-Stop strip test
@@ -49,10 +48,10 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 int buttonState;             // the current reading from the input pin
 int cur_mode = NO_MODE;
 */
-
+int welcome_beep = true;
 int relayState = LOW;         // the current state of the output pin
 
-int baseTime = 16000;        // initial base time (ms)
+int baseTime = 16;        // initial base time (ms)
 
 // LCD
 int ADDR = 0xA7;
@@ -62,16 +61,14 @@ byte c;
 
 LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
-
-
-/*
-for (int i=0; i< button_pins.size(); i++) {
-  
-}
-*/
+Button up_btn = Button(PINS_BTN_UP,PULLDOWN);
+Button down_btn = Button(PINS_BTN_DOWN,PULLDOWN);
 
 Button focus_btn = Button(PINS_BTN_FOCUS,PULLDOWN);
-Button cancel_btn = Button(PINS_BTN_CANCEL,PULLDOWN);
+Button mode_btn = Button(PINS_BTN_MODE,PULLDOWN);
+Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
+
+Button keys[5] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn};
 
 void setup() {
   Wire.begin(); // join i2c bus (address optional for master)
@@ -88,70 +85,33 @@ void setup() {
   lcd.cursorTo(0,0);
   lcd.printIn("DkroomDuino 0.1");
   lcd.cursorTo(2,0);
-  lcd.printIn("Bienvenido!");
+  lcd.printIn("Ready!");
   delay(1820);
 
-  digitalWrite(BUZZER_PIN, HIGH);
-  delay(40);
-  digitalWrite(BUZZER_PIN, LOW);
-  delay(100);
-  digitalWrite(BUZZER_PIN, HIGH);
-  delay(40);
-  digitalWrite(BUZZER_PIN, LOW);
+  if (welcome_beep) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(40);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(100);
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(40);
+    digitalWrite(BUZZER_PIN, LOW);
+  }
   
   lcd.clear();
 }
 
 void loop() {
-  if(focus_btn.uniquePress()){
-    focus();
+   int key = scanKeyboard();
+  if (key == 0) {
+      // LcdClearLine(2);
+      lcd.cursorTo(2,7);
+      char c[20];
+      
+      sprintf(c, "%3d.0 sec", baseTime);
+      
+      lcd.printIn(c); 
   }
-  
-  if(cancel_btn.uniquePress()){
-    cancel();
-  }
-  
-  /*
-  int key = scanKeyboard();
-  // char[] msg = "";
-  
-  if (key > NO_KEY) {
-    LcdClearLine(2);
-    lcd.cursorTo(2,0);
-
-    switch (key) {
-      case KEY_CANCEL:
-        cancel();
-        break;
-      case KEY_MODE:
-        modo();
-        break;
-      case KEY_LEFT:
-        lcd.printIn("Left");
-        break;
-      case KEY_UP:
-        lcd.printIn("Up");
-        break;
-      case KEY_DOWN:
-        lcd.printIn("Down");
-        break;
-      case KEY_RIGHT:
-        lcd.printIn("Right");
-        break;
-      case KEY_FOCUS:
-        focus();
-        break;
-      case KEY_GO:
-        lcd.printIn("Go!");
-        break;
-    }
-  }
-  
-  if (cur_mode != 0) {
-    // LcdClearLine(2);
-    // lcd.cursorTo(2,0);
-  }
-  */
 }
 
 void focus() {
@@ -162,6 +122,7 @@ void focus() {
       LcdClearLine(0);
       lcd.cursorTo(0,0);
       lcd.printIn("Focus");
+       LcdClearLine(2);
     } else {
       digitalWrite(RELAY_PIN,LOW);
       LcdClearLine(0);
@@ -169,7 +130,21 @@ void focus() {
     } 
 }
 
-
+void expose() {
+    btn_click();
+    if (relayState == LOW) {
+      digitalWrite(RELAY_PIN,HIGH);
+      relayState = HIGH;
+      LcdClearLine(0);
+      lcd.cursorTo(0,0);
+      lcd.printIn("Expose");
+    } else {
+      digitalWrite(RELAY_PIN,LOW);
+      LcdClearLine(0);
+      LcdClearLine(2);
+      relayState = LOW;
+    } 
+}
 
 void cancel() {
   // btn_click(); 
@@ -192,16 +167,32 @@ void btn_click() {
 }
 
 int scanKeyboard() {
-  /*
-  int key = 0;
-  for (int i= 0; i < NUM_BUTTONS; i++) {
-    buttonState = digitalRead(buttons[i]);
-    if (buttonState == 1) {
-      key = i+1;
-    }
+  int key = NO_KEY;
+  if(focus_btn.uniquePress()){
+    focus();
+    key = KEY_FOCUS;
+  }
+  
+  if(expose_btn.uniquePress()){
+    expose();
+    key = KEY_EXPOSE;
+  }
+  
+  if(up_btn.uniquePress()){
+    up();
+    key = KEY_UP;
+  }
+  
+  if(down_btn.uniquePress()){
+    down();
+    key = KEY_DOWN;
+  }
+  
+  if(mode_btn.uniquePress()){
+    modo();
+    key = KEY_MODE; 
   }
   return key;
-  */
 }
 
 void LcdClearLine(int r) {
@@ -211,14 +202,20 @@ void LcdClearLine(int r) {
   }
 }
 
+void up() {
+  btn_click();
+  if (baseTime < 100) {
+    baseTime++;
+  }
+}
+
+void down() {
+  btn_click();
+  if (baseTime > 0) {
+    baseTime--;
+  }
+}
+
 void modo() {
-  /*
-  LcdClearLine(0);
-  lcd.cursorTo(0,0);
-  lcd.printIn("Modo");
-  cur_mode = F_STOP_STRIP;
-  LcdClearLine(2);
-  lcd.cursorTo(2,0);
-  lcd.printIn("2 4 8 16 32 64");
-  */
+  btn_click();
 }
