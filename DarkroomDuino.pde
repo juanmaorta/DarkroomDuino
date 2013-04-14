@@ -49,10 +49,11 @@ int cur_mode = MODE_IDLE;
 
 // int buttonState;             // the current reading from the input pin
 
+boolean SERIAL_DEBUG = true;
 int welcome_beep = true;
 int relayState = LOW;         // the current state of the output pin
 
-int baseTime = 16;        // initial base time (ms)
+int baseTime = 3;        // initial base time (ms)
 
 // LCD
 int ADDR = 0xA7;
@@ -70,6 +71,9 @@ Button mode_btn = Button(PINS_BTN_MODE,PULLDOWN);
 Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
 
 Button keys[5] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn};
+
+long limitMillis = 0;
+long time_increase = 1000; // countdown interval (miliseconds)
 
 void setup() {
   Wire.begin(); // join i2c bus (address optional for master)
@@ -99,6 +103,9 @@ void setup() {
     digitalWrite(BUZZER_PIN, LOW);
   }
   
+  if (SERIAL_DEBUG) {
+     Serial.begin(14400); 
+  }
   lcd.clear();
 }
 

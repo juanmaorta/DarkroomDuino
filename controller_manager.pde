@@ -8,7 +8,7 @@
  
 // Runs the controller
 void controller_run(){
-   int key = keyboard_waitForAnyKey();
+  int key = keyboard_waitForAnyKey();
    switch (key) {
     case NO_KEY:
       idle();
@@ -19,6 +19,13 @@ void controller_run(){
     case KEY_FOCUS:
       focus();
       break;
+  }
+  
+  if (cur_mode == MODE_EXPOSE) {
+     // keeps timer
+     if (!countdown(baseTime)) {
+       set_expose_mode();
+     }
   }
 }
 
@@ -74,6 +81,7 @@ void set_expose_mode() {
         LcdClearLine(0);
         LcdClearLine(2);
         relayState = LOW;
+        limitMillis = 0;
       }
     }
 }
@@ -109,4 +117,16 @@ void down() {
 
 void modo() {
   btn_click();
+}
+
+boolean countdown(int seconds) {
+  unsigned long currentMillis = millis();
+  // unsigned int limitMillis = seconds * 1000;
+  if (limitMillis == 0) {
+     limitMillis = currentMillis + seconds * 1000;
+  }
+ if (currentMillis >= limitMillis) {
+    return false; 
+  }
+  return true;
 }
