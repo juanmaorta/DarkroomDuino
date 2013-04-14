@@ -23,8 +23,12 @@ void controller_run(){
   
   if (cur_mode == MODE_EXPOSE) {
      // keeps timer
-     if (!countdown(baseTime)) {
+     int finaltime = countdown(baseTime);
+     if (finaltime == 0) {
        set_expose_mode();
+     } else {
+       Serial.println(finaltime);
+       LcdPrintTime(finaltime);
      }
   }
 }
@@ -119,14 +123,15 @@ void modo() {
   btn_click();
 }
 
-boolean countdown(int seconds) {
-  unsigned long currentMillis = millis();
+float countdown(int seconds) {
+  float currentMillis = millis();
   // unsigned int limitMillis = seconds * 1000;
   if (limitMillis == 0) {
-     limitMillis = currentMillis + seconds * 1000;
+     limitMillis = currentMillis + (seconds * 1000);
   }
  if (currentMillis >= limitMillis) {
-    return false; 
-  }
-  return true;
+    return 0; 
+ } else {
+   return (limitMillis - currentMillis) / 1000;
+ }
 }

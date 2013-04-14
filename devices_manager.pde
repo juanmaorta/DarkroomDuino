@@ -46,3 +46,10 @@ void LcdPrintTime(int time) {
       sprintf(c, "%3d.0 sec", time);
       lcd.printIn(c); 
 }
+
+void LcdPrintTime(float time) {
+      lcd.cursorTo(2,7);
+      char c[20];
+      sprintf(c, "%3d.0 sec", time);
+      lcd.printIn(c); 
+}
