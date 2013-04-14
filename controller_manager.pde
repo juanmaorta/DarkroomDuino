@@ -9,11 +9,9 @@
 // Runs the controller
 void controller_run(){
    int key = keyboard_waitForAnyKey();
-  switch (key) {
+   switch (key) {
     case NO_KEY:
-      if (cur_mode == MODE_NONE) {
-        LcdPrintTime(baseTime);
-      }
+      idle();
       break;
     case KEY_EXPOSE:
       expose();
@@ -24,9 +22,18 @@ void controller_run(){
   }
 }
 
+void idle() {
+   if (cur_mode == MODE_IDLE) {
+     LcdClearLine(0);
+     lcd.cursorTo(0,15);
+     lcd.printIn("_");
+     LcdPrintTime(baseTime);
+   }
+}
+
 void focus() {
     btn_click();
-    if (cur_mode == MODE_NONE || cur_mode == MODE_FOCUS) {
+    if (cur_mode == MODE_IDLE || cur_mode == MODE_FOCUS) {
       if (relayState == LOW) {
         cur_mode = MODE_FOCUS;
         digitalWrite(RELAY_PIN,HIGH);
@@ -36,7 +43,7 @@ void focus() {
         lcd.printIn("Focus");
          LcdClearLine(2);
       } else {
-        cur_mode = MODE_NONE;
+        cur_mode = MODE_IDLE;
         digitalWrite(RELAY_PIN,LOW);
         LcdClearLine(0);
         relayState = LOW;
@@ -51,7 +58,7 @@ void expose() {
 
 void set_expose_mode() {
     btn_click();
-    if (cur_mode == MODE_NONE || cur_mode == MODE_EXPOSE) {
+    if (cur_mode == MODE_IDLE || cur_mode == MODE_EXPOSE) {
       
       if (relayState == LOW) {
         cur_mode = MODE_EXPOSE;
@@ -62,7 +69,7 @@ void set_expose_mode() {
         lcd.printIn("Expose");
 
       } else {
-        cur_mode = MODE_NONE;
+        cur_mode = MODE_IDLE;
         digitalWrite(RELAY_PIN,LOW);
         LcdClearLine(0);
         LcdClearLine(2);

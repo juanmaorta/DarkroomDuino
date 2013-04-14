@@ -39,11 +39,11 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define KEY_EXPOSE           8 // Expose button pressed
 
 // Execution modes
-#define MODE_NONE     0 // No mode selected
+#define MODE_IDLE     0 // No mode selected
 #define MODE_FOCUS    1 // Focus
 #define MODE_EXPOSE   2 // Expose
 
-int cur_mode = MODE_NONE;
+int cur_mode = MODE_IDLE;
 
 // Variables will change:
 
