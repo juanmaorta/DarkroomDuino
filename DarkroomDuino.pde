@@ -50,10 +50,11 @@ int cur_mode = MODE_IDLE;
 // int buttonState;             // the current reading from the input pin
 
 boolean SERIAL_DEBUG = true;
-int welcome_beep = true;
+boolean welcome_beep = true;
 int relayState = LOW;         // the current state of the output pin
 
-int baseTime = 16;        // initial base time (ms)
+int baseTime = 8;        // initial base time (ms)
+int baseStep = 1;
 
 // LCD
 int ADDR = 0xA7;

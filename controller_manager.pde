@@ -26,8 +26,24 @@ void controller_run(){
      int finaltime = countdown(baseTime);
      if (finaltime == 0) {
        set_expose_mode();
+
+      digitalWrite(BUZZER_PIN, HIGH);
+      delay(40);
+      digitalWrite(BUZZER_PIN, LOW);
+      delay(100);
+      digitalWrite(BUZZER_PIN, HIGH);
+      delay(40);
+      digitalWrite(BUZZER_PIN, LOW);
+      delay(100);
+      digitalWrite(BUZZER_PIN, HIGH);
+      delay(200);
+      digitalWrite(BUZZER_PIN, LOW);
+
+      baseStep ++;
+     
      } else {
        Serial.println(finaltime);
+       LcdPrintStep(baseStep);
        LcdPrintTime(finaltime);
      }
   }
@@ -70,7 +86,6 @@ void expose() {
 void set_expose_mode() {
     btn_click();
     if (cur_mode == MODE_IDLE || cur_mode == MODE_EXPOSE) {
-      
       if (relayState == LOW) {
         cur_mode = MODE_EXPOSE;
         digitalWrite(RELAY_PIN,HIGH);
@@ -78,7 +93,6 @@ void set_expose_mode() {
         LcdClearLine(0);
         lcd.cursorTo(0,0);
         lcd.printIn("Expose");
-
       } else {
         cur_mode = MODE_IDLE;
         digitalWrite(RELAY_PIN,LOW);
@@ -127,11 +141,11 @@ float countdown(int seconds) {
   float currentMillis = millis();
   // unsigned int limitMillis = seconds * 1000;
   if (limitMillis == 0) {
-     limitMillis = currentMillis + (seconds * 1000);
+    limitMillis = currentMillis + (seconds * 1000);
   }
- if (currentMillis >= limitMillis) {
+  if (currentMillis >= limitMillis) {
     return 0; 
- } else {
-   return (limitMillis - currentMillis) / 1000;
- }
+  } else {
+    return (limitMillis - currentMillis) / 1000;
+  }
 }
