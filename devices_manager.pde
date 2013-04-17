@@ -51,18 +51,23 @@ void LcdPrintTime(int time) {
 
 void LcdPrintTime(float millis) {
       float seconds = millis / 1000.00;
+
+      int d1 = seconds;
+      float f2 = seconds - d1;
+      int d2 = trunc(f2 * 100);
+
       lcd.cursorTo(2,7);
       char c[20];
       if (SERIAL_DEBUG) {
-        Serial.println(seconds);
+        Serial.println( sprintf(c, "%02d.%02d sec", d1, d2));
       }
-      sprintf(c, "%f", seconds);
+      sprintf(c, "%02d.%02d sec", d1, d2);
       lcd.printIn(c); 
 }
 
 void LcdPrintStep(int step) {
       lcd.cursorTo(2,0);
       char c[20];
-      sprintf(c, "step %2d", step);
+      sprintf(c, "st:%02d", step);
       lcd.printIn(c); 
 }

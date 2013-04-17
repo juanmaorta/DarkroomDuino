@@ -39,7 +39,7 @@ void controller_run(){
      
      } else {
        // Serial.println(finaltime);
-       // LcdPrintStep(baseStep);
+       LcdPrintStep(baseStep);
        LcdPrintTime(finaltime);
      }
   }
