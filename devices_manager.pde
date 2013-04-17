@@ -40,17 +40,23 @@ void LcdClearLine(int r) {
   }
 }
 
+/*
 void LcdPrintTime(int time) {
       lcd.cursorTo(2,7);
       char c[20];
       sprintf(c, "%3d.0 sec", time);
       lcd.printIn(c); 
 }
+*/
 
-void LcdPrintTime(float time) {
+void LcdPrintTime(float millis) {
+      float seconds = millis / 1000.00;
       lcd.cursorTo(2,7);
       char c[20];
-      sprintf(c, "%3d.0 sec", time);
+      if (SERIAL_DEBUG) {
+        Serial.println(seconds);
+      }
+      sprintf(c, "%f", seconds);
       lcd.printIn(c); 
 }
 

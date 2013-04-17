@@ -53,8 +53,8 @@ boolean SERIAL_DEBUG = true;
 boolean welcome_beep = true;
 int relayState = LOW;         // the current state of the output pin
 
-int baseTime = 8;        // initial base time (ms)
-int baseStep = 1;
+float baseTime = 8000;        // initial base time (ms)
+volatile int baseStep = 1;
 
 // LCD
 int ADDR = 0xA7;
@@ -74,7 +74,7 @@ Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
 Button keys[5] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn};
 
 float limitMillis = 0;
-long time_increase = 1000; // countdown interval (miliseconds)
+float time_increase = 1000; // countdown interval (miliseconds)
 
 void setup() {
   Wire.begin(); // join i2c bus (address optional for master)

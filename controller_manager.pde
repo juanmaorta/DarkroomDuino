@@ -38,8 +38,8 @@ void controller_run(){
       baseStep ++;
      
      } else {
-       Serial.println(finaltime);
-       LcdPrintStep(baseStep);
+       // Serial.println(finaltime);
+       // LcdPrintStep(baseStep);
        LcdPrintTime(finaltime);
      }
   }
@@ -75,7 +75,7 @@ void focus() {
 }
 
 void expose() {
-  int cur_time = baseTime; 
+  float cur_time = baseTime; 
   LcdPrintTime(cur_time);
 }
 
@@ -117,15 +117,15 @@ void cancel() {
 
 void up() {
   btn_click();
-  if (baseTime < 100) {
-    baseTime++;
+  if (baseTime < 100000.00) {
+    baseTime += 1000.00;
   }
 }
 
 void down() {
   btn_click();
   if (baseTime > 0) {
-    baseTime--;
+    baseTime -= 1000.00;
   }
 }
 
@@ -133,15 +133,15 @@ void modo() {
   btn_click();
 }
 
-float countdown(int seconds) {
+float countdown(float seconds) {
   float currentMillis = millis();
   // unsigned int limitMillis = seconds * 1000;
   if (limitMillis == 0) {
-    limitMillis = currentMillis + (seconds * 1000);
+    limitMillis = currentMillis + seconds;
   }
   if (currentMillis >= limitMillis) {
     return 0; 
   } else {
-    return (limitMillis - currentMillis) / 1000;
+    return limitMillis - currentMillis;
   }
 }
