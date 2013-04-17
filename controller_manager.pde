@@ -34,10 +34,6 @@ void controller_run(){
       digitalWrite(BUZZER_PIN, HIGH);
       delay(40);
       digitalWrite(BUZZER_PIN, LOW);
-      delay(100);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
 
       baseStep ++;
      
@@ -92,7 +88,7 @@ void set_expose_mode() {
         relayState = HIGH;
         LcdClearLine(0);
         lcd.cursorTo(0,0);
-        lcd.printIn("Expose");
+        lcd.printIn("Exposing");
       } else {
         cur_mode = MODE_IDLE;
         digitalWrite(RELAY_PIN,LOW);
