@@ -5,18 +5,22 @@ int keyboard_waitForAnyKey() {
   }
   
   if(expose_btn.uniquePress()){
+    set_expose_mode();
     key = KEY_EXPOSE;
   }
   
   if(up_btn.uniquePress()){
+    up();
     key = KEY_UP;
   }
   
   if(down_btn.uniquePress()){
+    down();
     key = KEY_DOWN;
   }
   
   if(mode_btn.uniquePress()){
+    modo();
     key = KEY_MODE; 
   }
   return key;
@@ -37,9 +41,9 @@ void LcdClearLine(int r) {
 }
 
 void LcdPrintTime(int time) {
-      lcd.cursorTo(2,10);
+      lcd.cursorTo(2,7);
       char c[20];
-      sprintf(c, "%3d.0\"", time);
+      sprintf(c, "%3d.0 sec", time);
       lcd.printIn(c); 
 }
 

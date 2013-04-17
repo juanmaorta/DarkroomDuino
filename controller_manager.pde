@@ -4,7 +4,8 @@
  *
  */
  
-
+ // Runs the controller
+ 
 // Runs the controller
 void controller_run(){
   int key = keyboard_waitForAnyKey();
@@ -13,49 +14,12 @@ void controller_run(){
       idle();
       break;
     case KEY_EXPOSE:
-      StateMachine.transitionTo(Expose);
+      expose();
       break;
     case KEY_FOCUS:
-      StateMachine.transitionTo(Focus);
-      break;
-    case KEY_UP:
-      StateMachine.transitionTo(IncreaseTime);
-      break;
-    case KEY_DOWN:
-      StateMachine.transitionTo(DecreaseTime);
+      focus();
       break;
   }
-  StateMachine.update();
-}
-
-// State machine utility functions
-
-void idle() {
-  /*
-  LcdClearLine(0);
-  lcd.cursorTo(0,0);
-  lcd.printIn("Idle");
-  */
-  lcd.cursorTo(0,15);
- lcd.printIn("_"); 
-  LcdPrintTime(baseTime);
-
-}
-
-void increaseTime() {
-  btn_click();
-  if (baseTime < 100) {
-    baseTime++;
-  }
-  StateMachine.transitionTo(Idle);
-}
-
-void decreaseTime() {
-  btn_click();
-  if (baseTime > 0) {
-    baseTime--;
-  }
-
   
   if (cur_mode == MODE_EXPOSE) {
      // keeps timer
@@ -111,28 +75,10 @@ void focus() {
 }
 
 void expose() {
-  btn_click();
-  if (StateMachine.isInState(Idle) || StateMachine.isInState(Expose)) {
-     if (relayState == LOW) {
-        cur_mode = MODE_EXPOSE;
-        digitalWrite(RELAY_PIN,HIGH);
-        relayState = HIGH;
-        LcdClearLine(0);
-        lcd.cursorTo(0,0);
-        lcd.printIn("Expose");
-        int cur_time = baseTime; 
-        LcdPrintTime(cur_time);
-      } else {
-        cur_mode = MODE_NONE;
-        digitalWrite(RELAY_PIN,LOW);
-        LcdClearLine(0);
-        LcdClearLine(2);
-        relayState = LOW;
-      }
-    }
+  int cur_time = baseTime; 
+  LcdPrintTime(cur_time);
 }
 
-/*
 void set_expose_mode() {
     btn_click();
     if (cur_mode == MODE_IDLE || cur_mode == MODE_EXPOSE) {
@@ -167,12 +113,21 @@ void cancel() {
   }
   relayState = LOW;
 }
-*/
 
 
-void up() {}
+void up() {
+  btn_click();
+  if (baseTime < 100) {
+    baseTime++;
+  }
+}
 
-void down() {}
+void down() {
+  btn_click();
+  if (baseTime > 0) {
+    baseTime--;
+  }
+}
 
 void modo() {
   btn_click();
