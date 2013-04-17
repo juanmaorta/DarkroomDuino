@@ -50,20 +50,22 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define KEY_EXPOSE           8 // Expose button pressed
 
 // Execution modes
-#define MODE_NONE     0 // No mode selected
+#define MODE_IDLE     0 // No mode selected
 #define MODE_FOCUS    1 // Focus
 #define MODE_EXPOSE   2 // Expose
 
-int cur_mode = MODE_NONE;
+int cur_mode = MODE_IDLE;
 
 // Variables will change:
 
 // int buttonState;             // the current reading from the input pin
 
-int welcome_beep = true;
+boolean SERIAL_DEBUG = true;
+boolean welcome_beep = true;
 int relayState = LOW;         // the current state of the output pin
 
-int baseTime = 16;        // initial base time (ms)
+int baseTime = 8;        // initial base time (ms)
+int baseStep = 1;
 
 // LCD
 int ADDR = 0xA7;
@@ -81,6 +83,9 @@ Button mode_btn = Button(PINS_BTN_MODE,PULLDOWN);
 Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
 
 Button keys[5] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn};
+
+float limitMillis = 0;
+long time_increase = 1000; // countdown interval (miliseconds)
 
 void setup() {
   Wire.begin(); // join i2c bus (address optional for master)
@@ -110,6 +115,9 @@ void setup() {
     digitalWrite(BUZZER_PIN, LOW);
   }
   
+  if (SERIAL_DEBUG) {
+     Serial.begin(115200); 
+  }
   lcd.clear();
 }
 

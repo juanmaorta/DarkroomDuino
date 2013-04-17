@@ -42,3 +42,17 @@ void LcdPrintTime(int time) {
       sprintf(c, "%3d.0\"", time);
       lcd.printIn(c); 
 }
+
+void LcdPrintTime(float time) {
+      lcd.cursorTo(2,7);
+      char c[20];
+      sprintf(c, "%3d.0 sec", time);
+      lcd.printIn(c); 
+}
+
+void LcdPrintStep(int step) {
+      lcd.cursorTo(2,0);
+      char c[20];
+      sprintf(c, "step %2d", step);
+      lcd.printIn(c); 
+}
