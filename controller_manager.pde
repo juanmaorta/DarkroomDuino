@@ -3,6 +3,8 @@
  *
  *
  */
+
+#include <math.h>
  
  // Runs the controller
  
@@ -36,7 +38,10 @@ void controller_run(){
       digitalWrite(BUZZER_PIN, LOW);
 
       baseStep ++;
-     
+      double term = getTerm((int)baseTime, factor, baseStep);
+      // no puedes sustituir baseTime, si no, no calcurá bien el 
+      // term. Hay que exponer usando otra variable y baseTime dejarla fija
+      // baseTime = term - baseTime;
      } else {
        // Serial.println(finaltime);
        LcdPrintStep(baseStep);
@@ -51,6 +56,7 @@ void idle() {
      lcd.cursorTo(0,15);
      lcd.printIn("_");
      LcdPrintTime(baseTime);
+     LcdPrintInc();
    }
 }
 
@@ -129,12 +135,26 @@ void time_down() {
   }
 }
 
-void step_up() {
+void incr_up() {
   btn_click();
+  if (currentIncr < 4) {
+    currentIncr++;
+  } else {
+    currentIncr = 0;
+  }
+  factor = steps[currentIncr];
+  LcdPrintInc();
 }
 
-void step_down() {
+void incr_down() {
   btn_click();
+  if (currentIncr > 0) {
+    currentIncr--;
+  } else {
+    currentIncr = 5;
+  }
+  factor = steps[currentIncr];
+  LcdPrintInc();
 }
 
 void modo() {
@@ -153,3 +173,18 @@ float countdown(float seconds) {
     return limitMillis - currentMillis;
   }
 }
+
+double getTerm(int init, float razon, int step) {
+  
+  double term = init * pow(razon, step - 1);
+  Serial.print("step ");
+  Serial.print(step);
+  Serial.print("\t");
+  Serial.print(term);
+  Serial.print("\t");
+  Serial.print(razon);
+  Serial.print("\n");
+  return term;
+  // term = A1 * razon ^term - 1
+}
+

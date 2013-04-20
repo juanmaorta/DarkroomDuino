@@ -24,13 +24,13 @@ int keyboard_waitForAnyKey() {
     key = KEY_MODE; 
   }
 
-  if (step_up_btn.uniquePress()) {
-    step_up();
+  if (incr_up_btn.uniquePress()) {
+    incr_up();
     key = KEY_UP;
   }
 
-  if (step_down_btn.uniquePress()) {
-    step_down();
+  if (incr_down_btn.uniquePress()) {
+    incr_down();
     key = KEY_DOWN;
   }
 
@@ -69,9 +69,9 @@ void LcdPrintTime(float millis) {
 
       lcd.cursorTo(2,7);
       char c[20];
-      if (SERIAL_DEBUG) {
-        Serial.println( sprintf(c, "%02d.%02d sec", d1, d2));
-      }
+      // if (SERIAL_DEBUG) {
+      //   Serial.println( sprintf(c, "%02d.%02d sec", d1, d2));
+      // }
       sprintf(c, "%02d.%02d sec", d1, d2);
       lcd.printIn(c); 
 }
@@ -82,3 +82,10 @@ void LcdPrintStep(int step) {
       sprintf(c, "t: %02d", step);
       lcd.printIn(c); 
 }
+
+void LcdPrintInc() {
+     lcd.cursorTo(2,0);
+     // lcd.printIn("    ");
+     // lcd.cursorTo(2,0);
+     lcd.printIn(stepStrings[currentIncr]);
+} 

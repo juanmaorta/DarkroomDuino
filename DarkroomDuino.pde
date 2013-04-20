@@ -10,8 +10,8 @@
 // Buttons pinout
 #define PINS_BTN_MODE           9  //(digital pin)
 
-#define PINS_BTN_STEP_UP           2  //(digital pin)
-#define PINS_BTN_STEP_DOWN         3  //(digital pin)
+#define PINS_BTN_incr_up           2  //(digital pin)
+#define PINS_BTN_incr_down         3  //(digital pin)
 
 #define PINS_BTN_UP             4  //(digital pin)
 #define PINS_BTN_DOWN           5  //(digital pin)
@@ -33,10 +33,10 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 // Keycodes
 #define NO_KEY               0 // No keys pressed
 #define KEY_MODE             1 // Mode button pressed
-#define KEY_STEP_UP             2 // Left button pressed
+#define KEY_incr_up             2 // Left button pressed
 #define KEY_UP               3 // Up button pressed
 #define KEY_DOWN             4 // Down button pressed
-#define KEY_STEP_DOWN            5 // Right button pressed
+#define KEY_incr_down            5 // Right button pressed
 #define KEY_CANCEL           6 // Cancel button pressed
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
@@ -69,8 +69,8 @@ LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
 Button mode_btn = Button(PINS_BTN_MODE,PULLDOWN);
 
-Button step_up_btn = Button(PINS_BTN_STEP_UP,PULLDOWN);
-Button step_down_btn = Button(PINS_BTN_STEP_DOWN,PULLDOWN);
+Button incr_up_btn = Button(PINS_BTN_incr_up,PULLDOWN);
+Button incr_down_btn = Button(PINS_BTN_incr_down,PULLDOWN);
 
 Button up_btn = Button(PINS_BTN_UP,PULLDOWN);
 Button down_btn = Button(PINS_BTN_DOWN,PULLDOWN);
@@ -78,10 +78,22 @@ Button down_btn = Button(PINS_BTN_DOWN,PULLDOWN);
 Button focus_btn = Button(PINS_BTN_FOCUS,PULLDOWN);
 Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
 
-Button keys[7] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn, step_up_btn, step_down_btn};
+Button keys[7] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn, incr_up_btn, incr_down_btn};
 
 float limitMillis = 0;
 float time_increase = 1000; // countdown interval (miliseconds)
+
+
+// el cálculo de la razón es 2 elevado a 1/3 para incrementos de 1/3
+
+// steps: 1, 1/2, 1/3
+double steps[5] = {2, 1.414213562, 1.25992105, 1.189207115, 1.122462048 };
+char* stepStrings[]={"1/1", "1/2", "1/3", "1/4", "1/6"};
+
+volatile int currentIncr = 2;
+volatile double factor = steps[currentIncr];
+// volatile char* lblIncr = stepStrings[currentIncr];
+
 
 void setup() {
   Wire.begin(); // join i2c bus (address optional for master)
