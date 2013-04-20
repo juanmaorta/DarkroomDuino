@@ -24,10 +24,10 @@ void controller_run(){
   }
   
   if (cur_mode == MODE_EXPOSE) {
-     // keeps timer
-     int finaltime = countdown(baseTime);
-     if (finaltime == 0) {
-       set_expose_mode();
+    // keeps timer
+    int finaltime = countdown(expTime);
+    if (finaltime == 0) {
+      set_expose_mode();
 
       digitalWrite(BUZZER_PIN, HIGH);
       delay(40);
@@ -39,14 +39,18 @@ void controller_run(){
 
       baseStep ++;
       double term = getTerm((int)baseTime, factor, baseStep);
+      
+      expTime = term - prevExpTime;
+      prevExpTime = term;
+
       // no puedes sustituir baseTime, si no, no calcurá bien el 
       // term. Hay que exponer usando otra variable y baseTime dejarla fija
       // baseTime = term - baseTime;
-     } else {
-       // Serial.println(finaltime);
-       LcdPrintStep(baseStep);
-       LcdPrintTime(finaltime);
-     }
+    } else {
+      // Serial.println(finaltime);
+      LcdPrintStep(baseStep);
+      LcdPrintTime(finaltime);
+    }
   }
 }
 
@@ -55,7 +59,7 @@ void idle() {
      LcdClearLine(0);
      lcd.cursorTo(0,15);
      lcd.printIn("_");
-     LcdPrintTime(baseTime);
+     LcdPrintTime(expTime);
      LcdPrintInc();
    }
 }
@@ -81,7 +85,7 @@ void focus() {
 }
 
 void expose() {
-  float cur_time = baseTime; 
+  float cur_time = expTime; 
   LcdPrintTime(cur_time);
 }
 
@@ -175,16 +179,15 @@ float countdown(float seconds) {
 }
 
 double getTerm(int init, float razon, int step) {
-  
   double term = init * pow(razon, step - 1);
-  Serial.print("step ");
-  Serial.print(step);
-  Serial.print("\t");
-  Serial.print(term);
-  Serial.print("\t");
-  Serial.print(razon);
-  Serial.print("\n");
+  if (SERIAL_DEBUG) {
+    Serial.print("step ");
+    Serial.print(step);
+    Serial.print("\t");
+    Serial.print(term);
+    Serial.print("\t");
+    Serial.print(razon);
+    Serial.print("\n");
+  }
   return term;
-  // term = A1 * razon ^term - 1
 }
-

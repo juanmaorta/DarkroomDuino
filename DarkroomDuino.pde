@@ -56,7 +56,9 @@ boolean SERIAL_DEBUG = true;
 boolean welcome_beep = true;
 int relayState = LOW;         // the current state of the output pin
 
-float baseTime = 8 * 1000.0;        // initial base time (ms)
+float baseTime = 2 * 1000.0;        // initial base time (ms)
+volatile float expTime = baseTime;
+volatile float prevExpTime = baseTime;
 volatile int baseStep = 1;
 
 // LCD
