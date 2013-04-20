@@ -115,18 +115,26 @@ void cancel() {
 }
 
 
-void up() {
+void time_up() {
   btn_click();
   if (baseTime < 100000.00) {
     baseTime += 1000.00;
   }
 }
 
-void down() {
+void time_down() {
   btn_click();
   if (baseTime > 0) {
     baseTime -= 1000.00;
   }
+}
+
+void step_up() {
+  btn_click();
+}
+
+void step_down() {
+  btn_click();
 }
 
 void modo() {

@@ -10,12 +10,12 @@ int keyboard_waitForAnyKey() {
   }
   
   if(up_btn.uniquePress()){
-    up();
+    time_up();
     key = KEY_UP;
   }
   
   if(down_btn.uniquePress()){
-    down();
+    time_down();
     key = KEY_DOWN;
   }
   
@@ -23,6 +23,17 @@ int keyboard_waitForAnyKey() {
     modo();
     key = KEY_MODE; 
   }
+
+  if (step_up_btn.uniquePress()) {
+    step_up();
+    key = KEY_UP;
+  }
+
+  if (step_down_btn.uniquePress()) {
+    step_down();
+    key = KEY_DOWN;
+  }
+
   return key;
 }
 

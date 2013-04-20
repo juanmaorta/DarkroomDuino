@@ -9,11 +9,14 @@
 
 // Buttons pinout
 #define PINS_BTN_MODE           9  //(digital pin)
-#define PINS_BTN_LEFT           2  //(digital pin)
-#define PINS_BTN_UP             3  //(digital pin)
-#define PINS_BTN_DOWN           4  //(digital pin)
-#define PINS_BTN_RIGHT          5  //(digital pin)
-#define PINS_BTN_CANCEL         6  //(digital pin)
+
+#define PINS_BTN_STEP_UP           2  //(digital pin)
+#define PINS_BTN_STEP_DOWN         3  //(digital pin)
+
+#define PINS_BTN_UP             4  //(digital pin)
+#define PINS_BTN_DOWN           5  //(digital pin)
+
+// #define PINS_BTN_CANCEL         6  //(digital pin)
 #define PINS_BTN_FOCUS          7  //(digital pin)
 #define PINS_BTN_GO             8  //(digital pin)
 
@@ -30,10 +33,10 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 // Keycodes
 #define NO_KEY               0 // No keys pressed
 #define KEY_MODE             1 // Mode button pressed
-#define KEY_LEFT             2 // Left button pressed
+#define KEY_STEP_UP             2 // Left button pressed
 #define KEY_UP               3 // Up button pressed
 #define KEY_DOWN             4 // Down button pressed
-#define KEY_RIGHT            5 // Right button pressed
+#define KEY_STEP_DOWN            5 // Right button pressed
 #define KEY_CANCEL           6 // Cancel button pressed
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
@@ -64,14 +67,18 @@ byte c;
 
 LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
+Button mode_btn = Button(PINS_BTN_MODE,PULLDOWN);
+
+Button step_up_btn = Button(PINS_BTN_STEP_UP,PULLDOWN);
+Button step_down_btn = Button(PINS_BTN_STEP_DOWN,PULLDOWN);
+
 Button up_btn = Button(PINS_BTN_UP,PULLDOWN);
 Button down_btn = Button(PINS_BTN_DOWN,PULLDOWN);
 
 Button focus_btn = Button(PINS_BTN_FOCUS,PULLDOWN);
-Button mode_btn = Button(PINS_BTN_MODE,PULLDOWN);
 Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
 
-Button keys[5] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn};
+Button keys[7] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn, step_up_btn, step_down_btn};
 
 float limitMillis = 0;
 float time_increase = 1000; // countdown interval (miliseconds)
