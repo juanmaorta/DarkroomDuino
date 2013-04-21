@@ -48,8 +48,10 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define MODE_FOCUS    1 // Focus
 #define MODE_EXPOSE   2 // Expose
 
-int cur_mode = MODE_IDLE;
+volatile int cur_mode = MODE_IDLE;
+volatile int last_mode = MODE_IDLE;
 volatile int current_key = NO_KEY;
+volatile int last_key = NO_KEY;
 
 // Variables will change:
 
@@ -139,36 +141,77 @@ void setup() {
 
 void scanKeyboard() {
   if(focus_btn.uniquePress()){
+    btn_click();
     current_key = KEY_FOCUS;
+    // focus();
+    if (cur_mode == MODE_IDLE) {
+      cur_mode = MODE_FOCUS;
+    } else if (cur_mode == MODE_FOCUS ){
+      cur_mode = MODE_IDLE;
+    }
   } else if (expose_btn.uniquePress()){
+    btn_click();
     current_key = KEY_EXPOSE;
+    if (cur_mode == MODE_IDLE) {
+      cur_mode = MODE_EXPOSE;
+    } else if (cur_mode == MODE_EXPOSE) {
+      cur_mode = MODE_IDLE;
+    }
   } else if(up_btn.uniquePress()){
+    btn_click();
     current_key = KEY_UP;
   } else if(down_btn.uniquePress()){
+    btn_click();
     current_key = KEY_DOWN;
   } else if(mode_btn.uniquePress()){
+    btn_click();
     current_key = KEY_MODE; 
   } else if (incr_up_btn.uniquePress()) {
+    btn_click();
     current_key = KEY_INCR_UP;
   } else if (incr_down_btn.uniquePress()) {
+    btn_click();
     current_key = KEY_INCR_DOWN;
-  } else {
-    current_key = NO_KEY;
   }
 }
 
 void loop() {
-  if (current_key != NO_KEY) {
-    btn_click();
+  if (last_mode != cur_mode) {
+    switch (cur_mode) {
+      case MODE_FOCUS:
+        digitalWrite(RELAY_PIN,HIGH);
+        lcd.cursorTo(2,0);
+        lcd.printIn("Focus");
+        break;
+      case MODE_EXPOSE:
+        digitalWrite(RELAY_PIN,HIGH);
+        lcd.cursorTo(2,0);
+        lcd.printIn("Expose");
+        break;
+      case MODE_IDLE:
+        digitalWrite(RELAY_PIN,LOW);
+        LcdClearLine(2);
+        lcd.cursorTo(2,0);
+        lcd.printIn("Idle");
+        break;
+    }
+    /*
+    if (cur_mode == MODE_FOCUS) {
+      digitalWrite(RELAY_PIN,HIGH);
+      lcd.cursorTo(2,0);
+      lcd.printIn("Focus");
+    } else if (cur_mode == MODE_IDLE) {
+      digitalWrite(RELAY_PIN,LOW);
+      LcdClearLine(2);
+      lcd.cursorTo(2,0);
+      lcd.printIn("Idle");
+    }
+    */
+    last_mode = cur_mode;
+
     lcd.cursorTo(0,0);
     char c[20];
-    sprintf(c, "k: %02d", current_key);
-    lcd.printIn(c);
-    
-    char d[20];
-    sprintf(d, " mode: %02d", cur_mode);
-    lcd.printIn(d);
+    sprintf(c, "mode: %02d", cur_mode);
+    lcd.printIn(c); 
   }
-  // LcdPrintTime(expTime);
-  // controller_run();
 }
