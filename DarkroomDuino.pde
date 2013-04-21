@@ -1,3 +1,5 @@
+
+#include <TimerOne.h>
 #include <Button.h>
 
 #include <Wire.h>
@@ -47,6 +49,7 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define MODE_EXPOSE   2 // Expose
 
 int cur_mode = MODE_IDLE;
+volatile int current_key = NO_KEY;
 
 // Variables will change:
 
@@ -129,8 +132,76 @@ void setup() {
      Serial.begin(115200); 
   }
   lcd.clear();
+
+  Timer1.initialize(20000);
+  Timer1.attachInterrupt(scanKeyboard);
+  
+  pinMode(PINS_BTN_FOCUS, INPUT);
+}
+
+void scanKeyboard() {
+  // int key = NO_KEY;
+  
+  if(focus_btn.uniquePress()){
+    current_key = KEY_FOCUS;
+    focus();
+  } else if (expose_btn.uniquePress()){
+    // set_expose_mode();
+    current_key = KEY_EXPOSE;
+    set_expose_mode();
+    // btn_click();
+  } else if(up_btn.uniquePress()){
+    // time_up();
+    current_key = KEY_UP;
+    // btn_click();
+  } else if(down_btn.uniquePress()){
+    // time_down();
+    current_key = KEY_DOWN;
+    // btn_click();
+  } else if(mode_btn.uniquePress()){
+    // modo();
+    // btn_click();
+    current_key = KEY_MODE; 
+  } else if (incr_up_btn.uniquePress()) {
+    // btn_click();
+    current_key = KEY_UP;
+  } else if (incr_down_btn.uniquePress()) {
+    // btn_click();
+    current_key = KEY_DOWN;
+  } else {
+    current_key = NO_KEY;
+  }
+  
+  
+  /*
+  switch (current_key) {
+    case NO_KEY:
+      idle();
+      break;
+    case KEY_EXPOSE:
+      expose();
+      break;
+    case KEY_FOCUS:
+      focus();
+      break;
+  }
+  */
+  
+  
 }
 
 void loop() {
-  controller_run();
+  if (current_key != NO_KEY) {
+    btn_click();
+    lcd.cursorTo(0,0);
+    char c[20];
+    sprintf(c, "k: %02d", current_key);
+    lcd.printIn(c);
+    
+    char d[20];
+    sprintf(d, " mode: %02d", cur_mode);
+    lcd.printIn(d);
+  }
+  // LcdPrintTime(expTime);
+  // controller_run();
 }
