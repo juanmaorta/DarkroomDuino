@@ -1,5 +1,5 @@
 
-#include <TimerOne.h>
+#include <MsTimer2.h>
 #include <Button.h>
 
 #include <Wire.h>
@@ -56,7 +56,7 @@ volatile int current_key = NO_KEY;
 // int buttonState;             // the current reading from the input pin
 
 boolean SERIAL_DEBUG = true;
-boolean welcome_beep = true;
+boolean welcome_beep = false;
 int relayState = LOW;         // the current state of the output pin
 
 float baseTime = 2 * 1000.0;        // initial base time (ms)
@@ -133,10 +133,8 @@ void setup() {
   }
   lcd.clear();
 
-  Timer1.initialize(20000);
-  Timer1.attachInterrupt(scanKeyboard);
-  
-  pinMode(PINS_BTN_FOCUS, INPUT);
+  MsTimer2::set(50, scanKeyboard);
+  MsTimer2::start();
 }
 
 void scanKeyboard() {
