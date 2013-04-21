@@ -34,19 +34,23 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 
 // Keycodes
 #define NO_KEY               0 // No keys pressed
-#define KEY_status             1 // Mode button pressed
-#define KEY_INCR_UP             2 // Left button pressed
+#define KEY_status           1 // Mode button pressed
+#define KEY_INCR_UP          2 // Left button pressed
 #define KEY_UP               3 // Up button pressed
 #define KEY_DOWN             4 // Down button pressed
-#define KEY_INCR_DOWN            5 // Right button pressed
+#define KEY_INCR_DOWN        5 // Right button pressed
 #define KEY_CANCEL           6 // Cancel button pressed
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
 
-// Execution modes
+// Execution statuses
 #define STATUS_IDLE     0 // No mode selected
 #define STATUS_FOCUS    1 // Focus
 #define STATUS_EXPOSE   2 // Expose
+
+// Execution modes
+#define PRINT_MODE  1
+#define TEST_MODE   2
 
 volatile int cur_status = STATUS_IDLE;
 volatile int last_status = STATUS_IDLE;
@@ -97,6 +101,12 @@ float time_increase = 1000; // countdown interval (miliseconds)
 double steps[5] = {2, 1.414213562, 1.25992105, 1.189207115, 1.122462048 };
 char* stepStrings[]={"1/1", "1/2", "1/3", "1/4", "1/6"};
 
+int modes[] = {PRINT_MODE, TEST_MODE};
+char* modeStrings[] = {"Print","Test"};
+int cur_mode = modes[0];
+int last_mode = cur_mode;
+
+
 volatile int currentIncr = 2;
 volatile double factor = steps[currentIncr];
 // volatile char* lblIncr = stepStrings[currentIncr];
@@ -137,6 +147,11 @@ void setup() {
 
   MsTimer2::set(50, scanKeyboard);
   MsTimer2::start();
+
+  // prints mode label
+  lcd.cursorTo(0,0);
+  lcd.printIn(modeStrings[0]);
+  LcdPrintTime(expTime);
 }
 
 void scanKeyboard() {
@@ -180,38 +195,30 @@ void loop() {
     switch (cur_status) {
       case STATUS_FOCUS:
         digitalWrite(RELAY_PIN,HIGH);
+        lcd.clear();
         lcd.cursorTo(2,0);
         lcd.printIn("Focus");
         break;
       case STATUS_EXPOSE:
         digitalWrite(RELAY_PIN,HIGH);
         lcd.cursorTo(2,0);
-        lcd.printIn("Expose");
+        lcd.printIn("Exp...");
         break;
       case STATUS_IDLE:
         digitalWrite(RELAY_PIN,LOW);
-        LcdClearLine(2);
-        lcd.cursorTo(2,0);
-        lcd.printIn("Idle");
+        lcd.clear();
+        lcd.cursorTo(0,0);
+        lcd.printIn(modeStrings[0]);
+        LcdPrintTime(expTime);
         break;
     }
-    /*
-    if (cur_status == STATUS_FOCUS) {
-      digitalWrite(RELAY_PIN,HIGH);
-      lcd.cursorTo(2,0);
-      lcd.printIn("Focus");
-    } else if (cur_status == STATUS_IDLE) {
-      digitalWrite(RELAY_PIN,LOW);
-      LcdClearLine(2);
-      lcd.cursorTo(2,0);
-      lcd.printIn("Idle");
-    }
-    */
     last_status = cur_status;
 
+    /*
     lcd.cursorTo(0,0);
     char c[20];
     sprintf(c, "status: %02d", cur_status);
     lcd.printIn(c); 
+    */
   }
 }
