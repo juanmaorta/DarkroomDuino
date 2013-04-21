@@ -19,9 +19,9 @@ int keyboard_waitForAnyKey() {
     key = KEY_DOWN;
   }
   
-  if(STATUS_btn.uniquePress()){
+  if(mode_btn.uniquePress()){
     modo();
-    key = KEY_status; 
+    key = KEY_MODE; 
   }
 
   if (incr_up_btn.uniquePress()) {

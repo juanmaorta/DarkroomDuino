@@ -34,7 +34,7 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 
 // Keycodes
 #define NO_KEY               0 // No keys pressed
-#define KEY_status           1 // Mode button pressed
+#define KEY_MODE           1 // Mode button pressed
 #define KEY_INCR_UP          2 // Left button pressed
 #define KEY_UP               3 // Up button pressed
 #define KEY_DOWN             4 // Down button pressed
@@ -49,8 +49,8 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define STATUS_EXPOSE   2 // Expose
 
 // Execution modes
-#define PRINT_MODE  1
-#define TEST_MODE   2
+#define PRINT_MODE  0
+#define TEST_MODE   1
 
 volatile int cur_status = STATUS_IDLE;
 volatile int last_status = STATUS_IDLE;
@@ -78,7 +78,7 @@ byte c;
 
 LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
-Button STATUS_btn = Button(PINS_BTN_status,PULLDOWN);
+Button mode_btn = Button(PINS_BTN_status,PULLDOWN);
 
 Button incr_up_btn = Button(PINS_BTN_incr_up,PULLDOWN);
 Button incr_down_btn = Button(PINS_BTN_incr_down,PULLDOWN);
@@ -89,7 +89,7 @@ Button down_btn = Button(PINS_BTN_DOWN,PULLDOWN);
 Button focus_btn = Button(PINS_BTN_FOCUS,PULLDOWN);
 Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
 
-Button keys[7] = {up_btn, down_btn, focus_btn, STATUS_btn, expose_btn, incr_up_btn, incr_down_btn};
+Button keys[7] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn, incr_up_btn, incr_down_btn};
 
 float limitMillis = 0;
 float time_increase = 1000; // countdown interval (miliseconds)
@@ -102,7 +102,7 @@ double steps[5] = {2, 1.414213562, 1.25992105, 1.189207115, 1.122462048 };
 char* stepStrings[]={"1/1", "1/2", "1/3", "1/4", "1/6"};
 
 int modes[] = {PRINT_MODE, TEST_MODE};
-char* modeStrings[] = {"Print","Test"};
+char* modeStrings[] = {"Print","Test "};
 int cur_mode = modes[0];
 int last_mode = cur_mode;
 
@@ -178,9 +178,16 @@ void scanKeyboard() {
   } else if(down_btn.uniquePress()){
     btn_click();
     current_key = KEY_DOWN;
-  } else if(STATUS_btn.uniquePress()){
+  } else if(mode_btn.uniquePress()){
     btn_click();
-    current_key = KEY_status; 
+    current_key = KEY_MODE; 
+    if (cur_status == STATUS_IDLE) {
+      if (cur_mode < 1) {
+        cur_mode++;
+      } else {
+        cur_mode = 0;
+      }
+    }
   } else if (incr_up_btn.uniquePress()) {
     btn_click();
     current_key = KEY_INCR_UP;
@@ -220,5 +227,9 @@ void loop() {
     sprintf(c, "status: %02d", cur_status);
     lcd.printIn(c); 
     */
+  }
+  if (cur_status != STATUS_FOCUS) {
+    lcd.cursorTo(0,0);
+    lcd.printIn(modeStrings[cur_mode]);
   }
 }
