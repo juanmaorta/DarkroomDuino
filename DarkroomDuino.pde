@@ -35,10 +35,10 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 // Keycodes
 #define NO_KEY               0 // No keys pressed
 #define KEY_MODE             1 // Mode button pressed
-#define KEY_incr_up             2 // Left button pressed
+#define KEY_INCR_UP             2 // Left button pressed
 #define KEY_UP               3 // Up button pressed
 #define KEY_DOWN             4 // Down button pressed
-#define KEY_incr_down            5 // Right button pressed
+#define KEY_INCR_DOWN            5 // Right button pressed
 #define KEY_CANCEL           6 // Cancel button pressed
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
@@ -138,54 +138,23 @@ void setup() {
 }
 
 void scanKeyboard() {
-  // int key = NO_KEY;
-  
   if(focus_btn.uniquePress()){
     current_key = KEY_FOCUS;
-    focus();
   } else if (expose_btn.uniquePress()){
-    // set_expose_mode();
     current_key = KEY_EXPOSE;
-    set_expose_mode();
-    // btn_click();
   } else if(up_btn.uniquePress()){
-    // time_up();
     current_key = KEY_UP;
-    // btn_click();
   } else if(down_btn.uniquePress()){
-    // time_down();
     current_key = KEY_DOWN;
-    // btn_click();
   } else if(mode_btn.uniquePress()){
-    // modo();
-    // btn_click();
     current_key = KEY_MODE; 
   } else if (incr_up_btn.uniquePress()) {
-    // btn_click();
-    current_key = KEY_UP;
+    current_key = KEY_INCR_UP;
   } else if (incr_down_btn.uniquePress()) {
-    // btn_click();
-    current_key = KEY_DOWN;
+    current_key = KEY_INCR_DOWN;
   } else {
     current_key = NO_KEY;
   }
-  
-  
-  /*
-  switch (current_key) {
-    case NO_KEY:
-      idle();
-      break;
-    case KEY_EXPOSE:
-      expose();
-      break;
-    case KEY_FOCUS:
-      focus();
-      break;
-  }
-  */
-  
-  
 }
 
 void loop() {
