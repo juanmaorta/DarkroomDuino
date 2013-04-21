@@ -23,11 +23,11 @@ void controller_run(){
       break;
   }
   
-  if (cur_mode == MODE_EXPOSE) {
+  if (cur_status == STATUS_EXPOSE) {
     // keeps timer
     int finaltime = countdown(expTime);
     if (finaltime == 0) {
-      set_expose_mode();
+      set_expose_status();
 
       digitalWrite(BUZZER_PIN, HIGH);
       delay(40);
@@ -55,7 +55,7 @@ void controller_run(){
 }
 
 void idle() {
-   if (cur_mode == MODE_IDLE) {
+   if (cur_status == STATUS_IDLE) {
      LcdClearLine(0);
      lcd.cursorTo(0,15);
      lcd.printIn("_");
@@ -65,9 +65,9 @@ void idle() {
 }
 
 void focus() {
-    if (cur_mode == MODE_IDLE || cur_mode == MODE_FOCUS) {
+    if (cur_status == STATUS_IDLE || cur_status == STATUS_FOCUS) {
       if (relayState == LOW) {
-        cur_mode = MODE_FOCUS;
+        cur_status = STATUS_FOCUS;
         digitalWrite(RELAY_PIN,HIGH);
         relayState = HIGH;
         // LcdClearLine(0);
@@ -77,7 +77,7 @@ void focus() {
         
         // LcdClearLine(2);
       } else {
-        cur_mode = MODE_IDLE;
+        cur_status = STATUS_IDLE;
         digitalWrite(RELAY_PIN,LOW);
         // LcdClearLine(0);
         relayState = LOW;
@@ -91,17 +91,17 @@ void expose() {
   LcdPrintTime(cur_time);
 }
 
-void set_expose_mode() {
-    if (cur_mode == MODE_IDLE || cur_mode == MODE_EXPOSE) {
+void set_expose_status() {
+    if (cur_status == STATUS_IDLE || cur_status == STATUS_EXPOSE) {
       if (relayState == LOW) {
-        cur_mode = MODE_EXPOSE;
+        cur_status = STATUS_EXPOSE;
         digitalWrite(RELAY_PIN,HIGH);
         relayState = HIGH;
         // LcdClearLine(0);
         // lcd.cursorTo(0,0);
         // lcd.printIn("Exposing");
       } else {
-        cur_mode = MODE_IDLE;
+        cur_status = STATUS_IDLE;
         digitalWrite(RELAY_PIN,LOW);
         // LcdClearLine(0);
         // LcdClearLine(2);

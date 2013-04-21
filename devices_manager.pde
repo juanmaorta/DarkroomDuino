@@ -5,7 +5,7 @@ int keyboard_waitForAnyKey() {
   }
   
   if(expose_btn.uniquePress()){
-    set_expose_mode();
+    set_expose_status();
     key = KEY_EXPOSE;
   }
   
@@ -19,9 +19,9 @@ int keyboard_waitForAnyKey() {
     key = KEY_DOWN;
   }
   
-  if(mode_btn.uniquePress()){
+  if(STATUS_btn.uniquePress()){
     modo();
-    key = KEY_MODE; 
+    key = KEY_status; 
   }
 
   if (incr_up_btn.uniquePress()) {
