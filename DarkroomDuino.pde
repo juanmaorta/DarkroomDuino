@@ -151,11 +151,12 @@ void setup() {
   // prints mode label
   lcd.cursorTo(0,0);
   lcd.printIn(modeStrings[0]);
-  LcdPrintTime(expTime);
+  LcdPrintTime(baseTime);
 }
 
 void scanKeyboard() {
   if(focus_btn.uniquePress()){
+    
     btn_click();
     current_key = KEY_FOCUS;
     // focus();
@@ -165,6 +166,7 @@ void scanKeyboard() {
       cur_status = STATUS_IDLE;
     }
   } else if (expose_btn.uniquePress()){
+    
     btn_click();
     current_key = KEY_EXPOSE;
     if (cur_status == STATUS_IDLE) {
@@ -173,12 +175,17 @@ void scanKeyboard() {
       cur_status = STATUS_IDLE;
     }
   } else if(up_btn.uniquePress()){
+    
     btn_click();
     current_key = KEY_UP;
+    time_up();
   } else if(down_btn.uniquePress()){
+    
     btn_click();
     current_key = KEY_DOWN;
+    time_down();
   } else if(mode_btn.uniquePress()){
+    
     btn_click();
     current_key = KEY_MODE; 
     if (cur_status == STATUS_IDLE) {
@@ -189,9 +196,11 @@ void scanKeyboard() {
       }
     }
   } else if (incr_up_btn.uniquePress()) {
+    
     btn_click();
     current_key = KEY_INCR_UP;
   } else if (incr_down_btn.uniquePress()) {
+    
     btn_click();
     current_key = KEY_INCR_DOWN;
   }
@@ -216,7 +225,7 @@ void loop() {
         lcd.clear();
         lcd.cursorTo(0,0);
         lcd.printIn(modeStrings[0]);
-        LcdPrintTime(expTime);
+        LcdPrintTime(baseTime);
         break;
     }
     last_status = cur_status;
@@ -228,8 +237,9 @@ void loop() {
     lcd.printIn(c); 
     */
   }
-  if (cur_status != STATUS_FOCUS) {
+  if (cur_status == STATUS_IDLE) {
     lcd.cursorTo(0,0);
     lcd.printIn(modeStrings[cur_mode]);
+    LcdPrintTime(baseTime);
   }
 }

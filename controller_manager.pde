@@ -135,7 +135,7 @@ void time_up() {
 
 void time_down() {
   btn_click();
-  if (baseTime > 0) {
+  if (baseTime > 1000.00) {
     baseTime -= 1000.00;
   }
 }
