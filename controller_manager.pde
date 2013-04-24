@@ -148,7 +148,10 @@ void incr_up() {
     currentIncr = 0;
   }
   factor = steps[currentIncr];
-  LcdPrintInc();
+  if (SERIAL_DEBUG) {
+    Serial.print("incrementos ");
+    Serial.println(currentIncr);
+  }
 }
 
 void incr_down() {
@@ -159,7 +162,10 @@ void incr_down() {
     currentIncr = 5;
   }
   factor = steps[currentIncr];
-  LcdPrintInc();
+  if (SERIAL_DEBUG) {
+    Serial.print("incrementos ");
+    Serial.println(currentIncr);
+  }
 }
 
 void modo() {

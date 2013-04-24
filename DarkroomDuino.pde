@@ -34,7 +34,7 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 
 // Keycodes
 #define NO_KEY               0 // No keys pressed
-#define KEY_MODE           1 // Mode button pressed
+#define KEY_MODE             1 // Mode button pressed
 #define KEY_INCR_UP          2 // Left button pressed
 #define KEY_UP               3 // Up button pressed
 #define KEY_DOWN             4 // Down button pressed
@@ -199,10 +199,16 @@ void scanKeyboard() {
     
     btn_click();
     current_key = KEY_INCR_UP;
+    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
+      incr_up();
+    }
   } else if (incr_down_btn.uniquePress()) {
     
     btn_click();
     current_key = KEY_INCR_DOWN;
+    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
+      incr_down();
+    }
   }
 }
 
@@ -241,5 +247,11 @@ void loop() {
     lcd.cursorTo(0,0);
     lcd.printIn(modeStrings[cur_mode]);
     LcdPrintTime(baseTime);
+    if (cur_mode == TEST_MODE) {
+      LcdPrintInc();
+    } else {
+      lcd.cursorTo(2,0);
+      lcd.printIn("     ");
+    }
   }
 }
