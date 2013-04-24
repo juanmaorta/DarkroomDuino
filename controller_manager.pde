@@ -150,7 +150,9 @@ void incr_up() {
   factor = steps[currentIncr];
   if (SERIAL_DEBUG) {
     Serial.print("incrementos ");
-    Serial.println(currentIncr);
+    Serial.print(currentIncr);
+    Serial.print("; factor: ");
+    Serial.println(factor);
   }
 }
 
@@ -164,7 +166,9 @@ void incr_down() {
   factor = steps[currentIncr];
   if (SERIAL_DEBUG) {
     Serial.print("incrementos ");
-    Serial.println(currentIncr);
+    Serial.print(currentIncr);
+    Serial.print("; factor: ");
+    Serial.println(factor);
   }
 }
 

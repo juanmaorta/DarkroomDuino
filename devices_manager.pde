@@ -84,7 +84,7 @@ void LcdPrintStep(int step) {
 }
 
 void LcdPrintInc() {
-     lcd.cursorTo(2,0);
+     lcd.cursorTo(0,13);
      // lcd.printIn("    ");
      // lcd.cursorTo(2,0);
      lcd.printIn(stepStrings[currentIncr]);

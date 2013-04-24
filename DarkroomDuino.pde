@@ -102,7 +102,7 @@ double steps[5] = {2, 1.414213562, 1.25992105, 1.189207115, 1.122462048 };
 char* stepStrings[]={"1/1", "1/2", "1/3", "1/4", "1/6"};
 
 int modes[] = {PRINT_MODE, TEST_MODE};
-char* modeStrings[] = {"Print","Test "};
+char* modeStrings[] = {"Print     ","Test strip"};
 int cur_mode = modes[0];
 int last_mode = cur_mode;
 
@@ -224,7 +224,11 @@ void loop() {
       case STATUS_EXPOSE:
         digitalWrite(RELAY_PIN,HIGH);
         lcd.cursorTo(2,0);
-        lcd.printIn("Exp...");
+        if (cur_mode == TEST_MODE) {
+          LcdPrintStep(baseStep);
+        } else {
+          lcd.printIn("Exp...");
+        }
         break;
       case STATUS_IDLE:
         digitalWrite(RELAY_PIN,LOW);
@@ -250,6 +254,8 @@ void loop() {
     if (cur_mode == TEST_MODE) {
       LcdPrintInc();
     } else {
+      lcd.cursorTo(0,13);
+      lcd.printIn("   ");
       lcd.cursorTo(2,0);
       lcd.printIn("     ");
     }
