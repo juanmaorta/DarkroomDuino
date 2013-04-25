@@ -117,6 +117,7 @@ void set_expose_status() {
 
 void cancel() {
   // btn_click(); 
+  /*
   LcdClearLine(0);   
   digitalWrite(RELAY_PIN,LOW);
   if (relayState == HIGH) {
@@ -127,22 +128,27 @@ void cancel() {
     btn_click(); 
   }
   relayState = LOW;
+  */
 }
 
 
 void time_up() {
-  btn_click();
-  if (baseTime < 100000.00) {
-    baseTime += 1000.00;
-    expTime = baseTime;
+  if (baseStep == 1) {
+    btn_click();
+    if (baseTime < 100000.00) {
+      baseTime += 1000.00;
+      expTime = baseTime;
+    }
   }
 }
 
 void time_down() {
-  btn_click();
-  if (baseTime > 1000.00) {
-    baseTime -= 1000.00;
-    expTime = baseTime;
+  if (baseStep == 1) {
+    btn_click();
+    if (baseTime > 1000.00) {
+      baseTime -= 1000.00;
+      expTime = baseTime;
+    }
   }
 }
 

@@ -65,7 +65,7 @@ boolean SERIAL_DEBUG = true;
 boolean welcome_beep = false;
 int relayState = LOW;         // the current state of the output pin
 
-float baseTime = 5 * 1000.0;        // initial base time (ms)
+volatile float baseTime = 5 * 1000.0;        // initial base time (ms)
 volatile float expTime = baseTime;
 volatile float prevExpTime = baseTime;
 volatile int baseStep = 1;
@@ -246,7 +246,20 @@ void loop() {
   if (cur_status == STATUS_IDLE) {
     lcd.cursorTo(0,0);
     lcd.printIn(modeStrings[cur_mode]);
-    // LcdPrintTime(baseTime);
+
+    if (cur_mode == PRINT_MODE) {
+      LcdPrintTime(baseTime);
+      baseStep = 1;
+      expTime = baseTime;
+      prevExpTime = baseTime;
+     } else {
+      if (baseStep > 1) {
+        // LcdPrintTime(expTime);
+      } else {
+        LcdPrintTime(baseTime);
+      }
+    }
+
     if (cur_mode == TEST_MODE) {
       LcdPrintInc();
     } else {
@@ -264,9 +277,7 @@ void loop() {
     if (finaltime == 0) {
       cur_status = STATUS_IDLE;
       digitalWrite(RELAY_PIN,LOW);
-        // LcdClearLine(0);
-        // LcdClearLine(2);
-        // relayState = LOW;
+
       limitMillis = 0;
 
       digitalWrite(BUZZER_PIN, HIGH);
@@ -283,9 +294,6 @@ void loop() {
       
         expTime = term - prevExpTime;
         prevExpTime = term;
-        Serial.print("expTime ");
-        Serial.println(expTime);
-
       }
 
       // no puedes sustituir baseTime, si no, no calcurá bien el 
