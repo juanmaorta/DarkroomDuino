@@ -1,3 +1,5 @@
+
+#include <MsTimer2.h>
 #include <Button.h>
 
 #include <Wire.h>
@@ -8,7 +10,7 @@
 // set pin numbers:
 
 // Buttons pinout
-#define PINS_BTN_MODE           9  //(digital pin)
+#define PINS_BTN_status           9  //(digital pin)
 
 #define PINS_BTN_incr_up           2  //(digital pin)
 #define PINS_BTN_incr_down         3  //(digital pin)
@@ -21,7 +23,7 @@
 #define PINS_BTN_GO             8  //(digital pin)
 
 
-int button_pins[5] = { PINS_BTN_UP, PINS_BTN_DOWN, PINS_BTN_MODE, PINS_BTN_FOCUS, PINS_BTN_GO };
+int button_pins[5] = { PINS_BTN_UP, PINS_BTN_DOWN, PINS_BTN_status, PINS_BTN_FOCUS, PINS_BTN_GO };
 int num_buttons = 5;
 
 
@@ -33,27 +35,34 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 // Keycodes
 #define NO_KEY               0 // No keys pressed
 #define KEY_MODE             1 // Mode button pressed
-#define KEY_incr_up             2 // Left button pressed
+#define KEY_INCR_UP          2 // Left button pressed
 #define KEY_UP               3 // Up button pressed
 #define KEY_DOWN             4 // Down button pressed
-#define KEY_incr_down            5 // Right button pressed
+#define KEY_INCR_DOWN        5 // Right button pressed
 #define KEY_CANCEL           6 // Cancel button pressed
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
 
-// Execution modes
-#define MODE_IDLE     0 // No mode selected
-#define MODE_FOCUS    1 // Focus
-#define MODE_EXPOSE   2 // Expose
+// Execution statuses
+#define STATUS_IDLE     0 // No mode selected
+#define STATUS_FOCUS    1 // Focus
+#define STATUS_EXPOSE   2 // Expose
 
-int cur_mode = MODE_IDLE;
+// Execution modes
+#define PRINT_MODE  0
+#define TEST_MODE   1
+
+volatile int cur_status = STATUS_IDLE;
+volatile int last_status = STATUS_IDLE;
+volatile int current_key = NO_KEY;
+volatile int last_key = NO_KEY;
 
 // Variables will change:
 
 // int buttonState;             // the current reading from the input pin
 
 boolean SERIAL_DEBUG = true;
-boolean welcome_beep = true;
+boolean welcome_beep = false;
 int relayState = LOW;         // the current state of the output pin
 
 float baseTime = 2 * 1000.0;        // initial base time (ms)
@@ -69,7 +78,7 @@ byte c;
 
 LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
-Button mode_btn = Button(PINS_BTN_MODE,PULLDOWN);
+Button mode_btn = Button(PINS_BTN_status,PULLDOWN);
 
 Button incr_up_btn = Button(PINS_BTN_incr_up,PULLDOWN);
 Button incr_down_btn = Button(PINS_BTN_incr_down,PULLDOWN);
@@ -91,6 +100,12 @@ float time_increase = 1000; // countdown interval (miliseconds)
 // steps: 1, 1/2, 1/3
 double steps[5] = {2, 1.414213562, 1.25992105, 1.189207115, 1.122462048 };
 char* stepStrings[]={"1/1", "1/2", "1/3", "1/4", "1/6"};
+
+int modes[] = {PRINT_MODE, TEST_MODE};
+char* modeStrings[] = {"Print     ","Test strip"};
+int cur_mode = modes[0];
+int last_mode = cur_mode;
+
 
 volatile int currentIncr = 2;
 volatile double factor = steps[currentIncr];
@@ -129,8 +144,120 @@ void setup() {
      Serial.begin(115200); 
   }
   lcd.clear();
+
+  MsTimer2::set(50, scanKeyboard);
+  MsTimer2::start();
+
+  // prints mode label
+  lcd.cursorTo(0,0);
+  lcd.printIn(modeStrings[0]);
+  LcdPrintTime(baseTime);
+}
+
+void scanKeyboard() {
+  if(focus_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_FOCUS;
+    // focus();
+    if (cur_status == STATUS_IDLE) {
+      cur_status = STATUS_FOCUS;
+    } else if (cur_status == STATUS_FOCUS ){
+      cur_status = STATUS_IDLE;
+    }
+  } else if (expose_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_EXPOSE;
+    if (cur_status == STATUS_IDLE) {
+      cur_status = STATUS_EXPOSE;
+    } else if (cur_status == STATUS_EXPOSE) {
+      cur_status = STATUS_IDLE;
+    }
+  } else if(up_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_UP;
+    time_up();
+  } else if(down_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_DOWN;
+    time_down();
+  } else if(mode_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_MODE; 
+    if (cur_status == STATUS_IDLE) {
+      if (cur_mode < 1) {
+        cur_mode++;
+      } else {
+        cur_mode = 0;
+      }
+    }
+  } else if (incr_up_btn.uniquePress()) {
+    
+    btn_click();
+    current_key = KEY_INCR_UP;
+    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
+      incr_up();
+    }
+  } else if (incr_down_btn.uniquePress()) {
+    
+    btn_click();
+    current_key = KEY_INCR_DOWN;
+    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
+      incr_down();
+    }
+  }
 }
 
 void loop() {
-  controller_run();
+  if (last_status != cur_status) {
+    switch (cur_status) {
+      case STATUS_FOCUS:
+        digitalWrite(RELAY_PIN,HIGH);
+        lcd.clear();
+        lcd.cursorTo(2,0);
+        lcd.printIn("Focus");
+        break;
+      case STATUS_EXPOSE:
+        digitalWrite(RELAY_PIN,HIGH);
+        lcd.cursorTo(2,0);
+        if (cur_mode == TEST_MODE) {
+          LcdPrintStep(baseStep);
+        } else {
+          lcd.printIn("Exp...");
+        }
+        break;
+      case STATUS_IDLE:
+        digitalWrite(RELAY_PIN,LOW);
+        lcd.clear();
+        lcd.cursorTo(0,0);
+        lcd.printIn(modeStrings[0]);
+        LcdPrintTime(baseTime);
+        break;
+    }
+    last_status = cur_status;
+
+    /*
+    lcd.cursorTo(0,0);
+    char c[20];
+    sprintf(c, "status: %02d", cur_status);
+    lcd.printIn(c); 
+    */
+  }
+  if (cur_status == STATUS_IDLE) {
+    lcd.cursorTo(0,0);
+    lcd.printIn(modeStrings[cur_mode]);
+    LcdPrintTime(baseTime);
+    if (cur_mode == TEST_MODE) {
+      LcdPrintInc();
+    } else {
+      lcd.cursorTo(0,13);
+      lcd.printIn("   ");
+      lcd.cursorTo(2,0);
+      lcd.printIn("     ");
+    }
+  }
 }

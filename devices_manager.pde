@@ -5,7 +5,7 @@ int keyboard_waitForAnyKey() {
   }
   
   if(expose_btn.uniquePress()){
-    set_expose_mode();
+    set_expose_status();
     key = KEY_EXPOSE;
   }
   
@@ -84,7 +84,7 @@ void LcdPrintStep(int step) {
 }
 
 void LcdPrintInc() {
-     lcd.cursorTo(2,0);
+     lcd.cursorTo(0,13);
      // lcd.printIn("    ");
      // lcd.cursorTo(2,0);
      lcd.printIn(stepStrings[currentIncr]);

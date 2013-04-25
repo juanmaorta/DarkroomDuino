@@ -10,7 +10,7 @@
  
 // Runs the controller
 void controller_run(){
-  int key = keyboard_waitForAnyKey();
+  int key = current_key;
    switch (key) {
     case NO_KEY:
       idle();
@@ -23,11 +23,11 @@ void controller_run(){
       break;
   }
   
-  if (cur_mode == MODE_EXPOSE) {
+  if (cur_status == STATUS_EXPOSE) {
     // keeps timer
     int finaltime = countdown(expTime);
     if (finaltime == 0) {
-      set_expose_mode();
+      set_expose_status();
 
       digitalWrite(BUZZER_PIN, HIGH);
       delay(40);
@@ -55,7 +55,7 @@ void controller_run(){
 }
 
 void idle() {
-   if (cur_mode == MODE_IDLE) {
+   if (cur_status == STATUS_IDLE) {
      LcdClearLine(0);
      lcd.cursorTo(0,15);
      lcd.printIn("_");
@@ -65,23 +65,25 @@ void idle() {
 }
 
 void focus() {
-    btn_click();
-    if (cur_mode == MODE_IDLE || cur_mode == MODE_FOCUS) {
+    if (cur_status == STATUS_IDLE || cur_status == STATUS_FOCUS) {
       if (relayState == LOW) {
-        cur_mode = MODE_FOCUS;
+        cur_status = STATUS_FOCUS;
         digitalWrite(RELAY_PIN,HIGH);
         relayState = HIGH;
-        LcdClearLine(0);
-        lcd.cursorTo(0,0);
-        lcd.printIn("Focus");
-         LcdClearLine(2);
+        // LcdClearLine(0);
+        
+        // lcd.cursorTo(2,0);
+        // lcd.printIn("Focus");
+        
+        // LcdClearLine(2);
       } else {
-        cur_mode = MODE_IDLE;
+        cur_status = STATUS_IDLE;
         digitalWrite(RELAY_PIN,LOW);
-        LcdClearLine(0);
+        // LcdClearLine(0);
         relayState = LOW;
-      }
+       }
     }
+    
 }
 
 void expose() {
@@ -89,21 +91,20 @@ void expose() {
   LcdPrintTime(cur_time);
 }
 
-void set_expose_mode() {
-    btn_click();
-    if (cur_mode == MODE_IDLE || cur_mode == MODE_EXPOSE) {
+void set_expose_status() {
+    if (cur_status == STATUS_IDLE || cur_status == STATUS_EXPOSE) {
       if (relayState == LOW) {
-        cur_mode = MODE_EXPOSE;
+        cur_status = STATUS_EXPOSE;
         digitalWrite(RELAY_PIN,HIGH);
         relayState = HIGH;
-        LcdClearLine(0);
-        lcd.cursorTo(0,0);
-        lcd.printIn("Exposing");
+        // LcdClearLine(0);
+        // lcd.cursorTo(0,0);
+        // lcd.printIn("Exposing");
       } else {
-        cur_mode = MODE_IDLE;
+        cur_status = STATUS_IDLE;
         digitalWrite(RELAY_PIN,LOW);
-        LcdClearLine(0);
-        LcdClearLine(2);
+        // LcdClearLine(0);
+        // LcdClearLine(2);
         relayState = LOW;
         limitMillis = 0;
       }
@@ -134,7 +135,7 @@ void time_up() {
 
 void time_down() {
   btn_click();
-  if (baseTime > 0) {
+  if (baseTime > 1000.00) {
     baseTime -= 1000.00;
   }
 }
@@ -147,7 +148,12 @@ void incr_up() {
     currentIncr = 0;
   }
   factor = steps[currentIncr];
-  LcdPrintInc();
+  if (SERIAL_DEBUG) {
+    Serial.print("incrementos ");
+    Serial.print(currentIncr);
+    Serial.print("; factor: ");
+    Serial.println(factor);
+  }
 }
 
 void incr_down() {
@@ -158,7 +164,12 @@ void incr_down() {
     currentIncr = 5;
   }
   factor = steps[currentIncr];
-  LcdPrintInc();
+  if (SERIAL_DEBUG) {
+    Serial.print("incrementos ");
+    Serial.print(currentIncr);
+    Serial.print("; factor: ");
+    Serial.println(factor);
+  }
 }
 
 void modo() {
