@@ -10,6 +10,7 @@
  
 // Runs the controller
 void controller_run(){
+  /*
   int key = current_key;
    switch (key) {
     case NO_KEY:
@@ -52,6 +53,7 @@ void controller_run(){
       LcdPrintTime(finaltime);
     }
   }
+  */
 }
 
 void idle() {
@@ -92,6 +94,7 @@ void expose() {
 }
 
 void set_expose_status() {
+    /*
     if (cur_status == STATUS_IDLE || cur_status == STATUS_EXPOSE) {
       if (relayState == LOW) {
         cur_status = STATUS_EXPOSE;
@@ -99,7 +102,7 @@ void set_expose_status() {
         relayState = HIGH;
         // LcdClearLine(0);
         // lcd.cursorTo(0,0);
-        // lcd.printIn("Exposing");
+        lcd.printIn("Exposing");
       } else {
         cur_status = STATUS_IDLE;
         digitalWrite(RELAY_PIN,LOW);
@@ -109,6 +112,7 @@ void set_expose_status() {
         limitMillis = 0;
       }
     }
+    */
 }
 
 void cancel() {
@@ -130,6 +134,7 @@ void time_up() {
   btn_click();
   if (baseTime < 100000.00) {
     baseTime += 1000.00;
+    expTime = baseTime;
   }
 }
 
@@ -137,6 +142,7 @@ void time_down() {
   btn_click();
   if (baseTime > 1000.00) {
     baseTime -= 1000.00;
+    expTime = baseTime;
   }
 }
 

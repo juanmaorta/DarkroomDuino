@@ -65,7 +65,7 @@ boolean SERIAL_DEBUG = true;
 boolean welcome_beep = false;
 int relayState = LOW;         // the current state of the output pin
 
-float baseTime = 2 * 1000.0;        // initial base time (ms)
+float baseTime = 5 * 1000.0;        // initial base time (ms)
 volatile float expTime = baseTime;
 volatile float prevExpTime = baseTime;
 volatile int baseStep = 1;
@@ -172,7 +172,10 @@ void scanKeyboard() {
     if (cur_status == STATUS_IDLE) {
       cur_status = STATUS_EXPOSE;
     } else if (cur_status == STATUS_EXPOSE) {
+      // cancel
       cur_status = STATUS_IDLE;
+      expTime = baseTime;
+      limitMillis = 0;
     }
   } else if(up_btn.uniquePress()){
     
@@ -222,12 +225,12 @@ void loop() {
         lcd.printIn("Focus");
         break;
       case STATUS_EXPOSE:
-        digitalWrite(RELAY_PIN,HIGH);
+        // digitalWrite(RELAY_PIN,HIGH);
         lcd.cursorTo(2,0);
         if (cur_mode == TEST_MODE) {
           LcdPrintStep(baseStep);
         } else {
-          lcd.printIn("Exp...");
+          // lcd.printIn("Exp...");
         }
         break;
       case STATUS_IDLE:
@@ -235,22 +238,15 @@ void loop() {
         lcd.clear();
         lcd.cursorTo(0,0);
         lcd.printIn(modeStrings[0]);
-        LcdPrintTime(baseTime);
+        LcdPrintTime(expTime);
         break;
     }
     last_status = cur_status;
-
-    /*
-    lcd.cursorTo(0,0);
-    char c[20];
-    sprintf(c, "status: %02d", cur_status);
-    lcd.printIn(c); 
-    */
   }
   if (cur_status == STATUS_IDLE) {
     lcd.cursorTo(0,0);
     lcd.printIn(modeStrings[cur_mode]);
-    LcdPrintTime(baseTime);
+    // LcdPrintTime(baseTime);
     if (cur_mode == TEST_MODE) {
       LcdPrintInc();
     } else {
@@ -258,6 +254,49 @@ void loop() {
       lcd.printIn("   ");
       lcd.cursorTo(2,0);
       lcd.printIn("     ");
+    }
+  }
+
+  if (cur_status == STATUS_EXPOSE) {
+    digitalWrite(RELAY_PIN,HIGH);
+    // keeps timer
+    int finaltime = countdown(expTime);
+    if (finaltime == 0) {
+      cur_status = STATUS_IDLE;
+      digitalWrite(RELAY_PIN,LOW);
+        // LcdClearLine(0);
+        // LcdClearLine(2);
+        // relayState = LOW;
+      limitMillis = 0;
+
+      digitalWrite(BUZZER_PIN, HIGH);
+      delay(40);
+      digitalWrite(BUZZER_PIN, LOW);
+      delay(100);
+      digitalWrite(BUZZER_PIN, HIGH);
+      delay(40);
+      digitalWrite(BUZZER_PIN, LOW);
+
+      if (cur_mode == TEST_MODE) {
+        baseStep ++;
+        double term = getTerm((int)baseTime, factor, baseStep);
+      
+        expTime = term - prevExpTime;
+        prevExpTime = term;
+        Serial.print("expTime ");
+        Serial.println(expTime);
+
+      }
+
+      // no puedes sustituir baseTime, si no, no calcurá bien el 
+      // term. Hay que exponer usando otra variable y baseTime dejarla fija
+      // baseTime = term - baseTime;
+    } else {
+      // no es final, sigue el timer
+      if (cur_mode == TEST_MODE) {
+        LcdPrintStep(baseStep);
+      }
+      LcdPrintTime(finaltime);
     }
   }
 }
