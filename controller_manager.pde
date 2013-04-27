@@ -153,22 +153,26 @@ void time_down() {
 }
 
 void incr_up() {
-  btn_click();
-  if (currentIncr < 4) {
-    currentIncr++;
-  } else {
-    currentIncr = 0;
-  }
-  factor = steps[currentIncr];
-  if (SERIAL_DEBUG) {
-    Serial.print("incrementos ");
-    Serial.print(currentIncr);
-    Serial.print("; factor: ");
-    Serial.println(factor);
+  if (baseStep == 1) {
+    btn_click();
+    if (currentIncr < 4) {
+      currentIncr++;
+    } else {
+      currentIncr = 0;
+    }
+    factor = steps[currentIncr];
+    if (SERIAL_DEBUG) {
+      Serial.print("incrementos ");
+      Serial.print(currentIncr);
+      Serial.print("; factor: ");
+      Serial.println(factor);
+    }
   }
 }
 
 void incr_down() {
+  btn_click();
+  /*
   btn_click();
   if (currentIncr > 0) {
     currentIncr--;
@@ -182,6 +186,7 @@ void incr_down() {
     Serial.print("; factor: ");
     Serial.println(factor);
   }
+  */
 }
 
 void modo() {

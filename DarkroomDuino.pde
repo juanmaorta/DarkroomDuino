@@ -10,17 +10,16 @@
 // set pin numbers:
 
 // Buttons pinout
-#define PINS_BTN_status           9  //(digital pin)
+#define PINS_BTN_status           2    //(digital pin)
 
-#define PINS_BTN_incr_up           2  //(digital pin)
-#define PINS_BTN_incr_down         3  //(digital pin)
+#define PINS_BTN_INCR_UP          5  //(digital pin)
+#define PINS_BTN_OK               6  //(digital pin)
 
-#define PINS_BTN_UP             4  //(digital pin)
-#define PINS_BTN_DOWN           5  //(digital pin)
+#define PINS_BTN_UP               3  //(digital pin)
+#define PINS_BTN_DOWN             4  //(digital pin)
 
-// #define PINS_BTN_CANCEL         6  //(digital pin)
-#define PINS_BTN_FOCUS          7  //(digital pin)
-#define PINS_BTN_GO             8  //(digital pin)
+#define PINS_BTN_FOCUS            7  //(digital pin)
+#define PINS_BTN_GO               8  //(digital pin)
 
 
 int button_pins[5] = { PINS_BTN_UP, PINS_BTN_DOWN, PINS_BTN_status, PINS_BTN_FOCUS, PINS_BTN_GO };
@@ -38,8 +37,8 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define KEY_INCR_UP          2 // Left button pressed
 #define KEY_UP               3 // Up button pressed
 #define KEY_DOWN             4 // Down button pressed
-#define KEY_INCR_DOWN        5 // Right button pressed
-#define KEY_CANCEL           6 // Cancel button pressed
+#define KEY_OK        5 // Right button pressed
+// #define KEY_CANCEL           6 // Cancel button pressed
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
 
@@ -62,10 +61,12 @@ volatile int last_key = NO_KEY;
 // int buttonState;             // the current reading from the input pin
 
 boolean SERIAL_DEBUG = true;
-boolean welcome_beep = false;
+boolean welcome_beep = true;
 int relayState = LOW;         // the current state of the output pin
 
-volatile float baseTime = 5 * 1000.0;        // initial base time (ms)
+const int start_time = 8;
+
+volatile float baseTime = start_time * 1000.0;        // initial base time (ms)
 volatile float expTime = baseTime;
 volatile float prevExpTime = baseTime;
 volatile int baseStep = 1;
@@ -80,8 +81,9 @@ LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
 Button mode_btn = Button(PINS_BTN_status,PULLDOWN);
 
-Button incr_up_btn = Button(PINS_BTN_incr_up,PULLDOWN);
-Button incr_down_btn = Button(PINS_BTN_incr_down,PULLDOWN);
+Button incr_up_btn = Button(PINS_BTN_INCR_UP,PULLDOWN);
+Button ok_btn = Button(PINS_BTN_OK,PULLDOWN);
+// Button ok_btn = Button(PINS_BTN_OK,PULLDOWN);
 
 Button up_btn = Button(PINS_BTN_UP,PULLDOWN);
 Button down_btn = Button(PINS_BTN_DOWN,PULLDOWN);
@@ -89,7 +91,7 @@ Button down_btn = Button(PINS_BTN_DOWN,PULLDOWN);
 Button focus_btn = Button(PINS_BTN_FOCUS,PULLDOWN);
 Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
 
-Button keys[7] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn, incr_up_btn, incr_down_btn};
+Button keys[7] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn, incr_up_btn, ok_btn};
 
 float limitMillis = 0;
 float time_increase = 1000; // countdown interval (miliseconds)
@@ -205,13 +207,15 @@ void scanKeyboard() {
     if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
       incr_up();
     }
-  } else if (incr_down_btn.uniquePress()) {
+  } else if (ok_btn.uniquePress()) {
     
     btn_click();
-    current_key = KEY_INCR_DOWN;
+    current_key = KEY_OK;
+    /*
     if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
       incr_down();
     }
+    */
   }
 }
 

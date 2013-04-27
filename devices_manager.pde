@@ -29,9 +29,9 @@ int keyboard_waitForAnyKey() {
     key = KEY_UP;
   }
 
-  if (incr_down_btn.uniquePress()) {
-    incr_down();
-    key = KEY_DOWN;
+  if (ok_btn.uniquePress()) {
+    // incr_down();
+    key = KEY_OK;
   }
 
   return key;
