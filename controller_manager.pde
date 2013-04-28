@@ -58,13 +58,9 @@ void scanKeyboard() {
       incr_up();
     }
   } else if (ok_btn.uniquePress()) {
-    
-    show_intervals();
-    /*
-    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
-      incr_down();
+    if (baseStep > 1) { 
+      show_intervals();
     }
-    */
   }
 }
 
@@ -169,14 +165,30 @@ void incr_down() {
 
 void show_intervals() {
   btn_click();
+  
+  
+
   current_key = KEY_OK;
   if (SERIAL_DEBUG) {
     for (int i = 0; i < baseStep; i++) { 
+      if (i == current_displayed_interval) {
+        Serial.print("[x] "); 
+      } else {
+        Serial.print("[ ] "); 
+      }
       Serial.print("step ");
       Serial.print(i);
       Serial.print(" :");
       Serial.println(intervals[i]);
+
     }
+  }
+  Serial.println(baseStep);
+  Serial.println(current_displayed_interval);
+  if (current_displayed_interval < baseStep - 2) {
+    current_displayed_interval ++;
+  } else {
+    current_displayed_interval = 0;
   }
 }
 

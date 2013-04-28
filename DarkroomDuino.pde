@@ -76,6 +76,7 @@ float limitMillis = 0;
 float time_increase = 1000;                           // countdown interval (miliseconds)
 float intervals[15] = {0};
 int num_intervals = 15;
+int current_displayed_interval = 0;
 
 
 
@@ -204,6 +205,7 @@ void loop() {
       for (int i = 0; i < num_intervals; i++) {
         intervals[i] = 0;
       }
+      current_displayed_interval = 0;
      } else {
       if (baseStep > 1) {
         // LcdPrintTime(expTime);
