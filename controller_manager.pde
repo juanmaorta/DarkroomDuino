@@ -37,8 +37,6 @@ void scanKeyboard() {
     current_key = KEY_UP;
     time_up();
   } else if(down_btn.isPressed()){
-    
-    btn_click();
     current_key = KEY_DOWN;
     time_down();
   } else if(mode_btn.uniquePress()){
@@ -61,8 +59,7 @@ void scanKeyboard() {
     }
   } else if (ok_btn.uniquePress()) {
     
-    btn_click();
-    current_key = KEY_OK;
+    show_intervals();
     /*
     if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
       incr_down();
@@ -117,6 +114,7 @@ void time_up() {
     if (baseTime < 100000.00) {
       baseTime += 100.00;
       expTime = baseTime;
+      intervals[0] = baseTime;
     }
   }
 }
@@ -142,6 +140,7 @@ void time_down() {
     if (baseTime > 1000.00) {
       baseTime -= 100.00;
       expTime = baseTime;
+      intervals[0] = baseTime;
     }
   }
 }
@@ -166,6 +165,19 @@ void incr_up() {
 
 void incr_down() {
   btn_click();
+}
+
+void show_intervals() {
+  btn_click();
+  current_key = KEY_OK;
+  if (SERIAL_DEBUG) {
+    for (int i = 0; i < baseStep; i++) { 
+      Serial.print("step ");
+      Serial.print(i);
+      Serial.print(" :");
+      Serial.println(intervals[i]);
+    }
+  }
 }
 
 float countdown(float seconds) {

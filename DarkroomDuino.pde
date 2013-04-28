@@ -74,6 +74,7 @@ volatile float prevExpTime = baseTime;
 volatile int baseStep = 1;
 float limitMillis = 0;
 float time_increase = 1000;                           // countdown interval (miliseconds)
+float intervals[15] = {baseTime};
 
 
 
@@ -236,9 +237,12 @@ void loop() {
       digitalWrite(BUZZER_PIN, LOW);
 
       if (cur_mode == TEST_MODE) {
+       
         baseStep ++;
         double term = getTerm((int)baseTime, factor, baseStep);
       
+         intervals[baseStep - 1] = term;
+
         expTime = term - prevExpTime;
         prevExpTime = term;
       }
