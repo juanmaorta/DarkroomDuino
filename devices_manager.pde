@@ -1,42 +1,7 @@
-int keyboard_waitForAnyKey() {
-  int key = NO_KEY;
-  if(focus_btn.uniquePress()){
-    key = KEY_FOCUS;
-  }
-  
-  if(expose_btn.uniquePress()){
-    set_expose_status();
-    key = KEY_EXPOSE;
-  }
-  
-  if(up_btn.uniquePress()){
-    time_up();
-    key = KEY_UP;
-  }
-  
-  if(down_btn.uniquePress()){
-    time_down();
-    key = KEY_DOWN;
-  }
-  
-  if(mode_btn.uniquePress()){
-    modo();
-    key = KEY_MODE; 
-  }
-
-  if (incr_up_btn.uniquePress()) {
-    incr_up();
-    key = KEY_UP;
-  }
-
-  if (ok_btn.uniquePress()) {
-    // incr_down();
-    key = KEY_OK;
-  }
-
-  return key;
-}
-
+/*
+ * This file is part of DarkroomDuino
+ *
+ */
 
 void btn_click() {
     digitalWrite(BUZZER_PIN, HIGH);
@@ -50,15 +15,6 @@ void LcdClearLine(int r) {
     lcd.printIn(" ");
   }
 }
-
-/*
-void LcdPrintTime(int time) {
-      lcd.cursorTo(2,7);
-      char c[20];
-      sprintf(c, "%3d.0 sec", time);
-      lcd.printIn(c); 
-}
-*/
 
 void LcdPrintTime(float millis) {
       float seconds = millis / 1000.00;
@@ -85,7 +41,5 @@ void LcdPrintStep(int step) {
 
 void LcdPrintInc() {
      lcd.cursorTo(0,13);
-     // lcd.printIn("    ");
-     // lcd.cursorTo(2,0);
      lcd.printIn(stepStrings[currentIncr]);
 } 

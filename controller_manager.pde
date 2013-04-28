@@ -1,17 +1,77 @@
 /*
  * This file is part of DarkroomDuino
  *
- *
  */
 
 #include <math.h>
- 
- // Runs the controller
  
 // Runs the controller
 void controller_run(){}
 void set_expose_status() {}
 void cancel() {}
+
+void scanKeyboard() {
+  if(focus_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_FOCUS;
+    // focus();
+    if (cur_status == STATUS_IDLE) {
+      cur_status = STATUS_FOCUS;
+    } else if (cur_status == STATUS_FOCUS ){
+      cur_status = STATUS_IDLE;
+    }
+  } else if (expose_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_EXPOSE;
+    if (cur_status == STATUS_IDLE) {
+      cur_status = STATUS_EXPOSE;
+    } else if (cur_status == STATUS_EXPOSE) {
+      // cancel
+      cur_status = STATUS_IDLE;
+      expTime = baseTime;
+      limitMillis = 0;
+    }
+  } else if(up_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_UP;
+    time_up();
+  } else if(down_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_DOWN;
+    time_down();
+  } else if(mode_btn.uniquePress()){
+    
+    btn_click();
+    current_key = KEY_MODE; 
+    if (cur_status == STATUS_IDLE) {
+      if (cur_mode < 1) {
+        cur_mode++;
+      } else {
+        cur_mode = 0;
+      }
+    }
+  } else if (incr_up_btn.uniquePress()) {
+    
+    btn_click();
+    current_key = KEY_INCR_UP;
+    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
+      incr_up();
+    }
+  } else if (ok_btn.uniquePress()) {
+    
+    btn_click();
+    current_key = KEY_OK;
+    /*
+    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
+      incr_down();
+    }
+    */
+  }
+}
 
 void idle() {
    if (cur_status == STATUS_IDLE) {
@@ -32,22 +92,11 @@ void focus() {
       } else {
         cur_status = STATUS_IDLE;
         digitalWrite(RELAY_PIN,LOW);
-        // LcdClearLine(0);
         relayState = LOW;
        }
     }
     
 }
-
-void expose() {
-  float cur_time = expTime; 
-  LcdPrintTime(cur_time);
-}
-
-void set_expose_status() {}
-
-void cancel() {}
-
 
 void time_up() {
   if (baseStep == 1) {
@@ -88,25 +137,6 @@ void incr_up() {
 }
 
 void incr_down() {
-  btn_click();
-  /*
-  btn_click();
-  if (currentIncr > 0) {
-    currentIncr--;
-  } else {
-    currentIncr = 5;
-  }
-  factor = steps[currentIncr];
-  if (SERIAL_DEBUG) {
-    Serial.print("incrementos ");
-    Serial.print(currentIncr);
-    Serial.print("; factor: ");
-    Serial.println(factor);
-  }
-  */
-}
-
-void modo() {
   btn_click();
 }
 

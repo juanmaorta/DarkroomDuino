@@ -26,10 +26,14 @@ int button_pins[5] = { PINS_BTN_UP, PINS_BTN_DOWN, PINS_BTN_status, PINS_BTN_FOC
 int num_buttons = 5;
 
 
-const int RELAY_PIN =  11;      // the number of the LED pin
-const int BUZZER_PIN =  12;      // the number of the LED pin
-const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
+const int RELAY_PIN =     11;      // the number of the LED pin
+const int BUZZER_PIN =    12;     // the number of the LED pin
 
+const int CLICK_LENGTH =  1;     // miliseconds for click audio feedback
+
+
+#define MAJOR_VERSION 0
+#define MINOR_VERSION 1
 
 // Keycodes
 #define NO_KEY               0 // No keys pressed
@@ -37,8 +41,7 @@ const int CLICK_LENGTH = 1; // miliseconds for click audio feedback
 #define KEY_INCR_UP          2 // Left button pressed
 #define KEY_UP               3 // Up button pressed
 #define KEY_DOWN             4 // Down button pressed
-#define KEY_OK        5 // Right button pressed
-// #define KEY_CANCEL           6 // Cancel button pressed
+#define KEY_OK               5 // Right button pressed
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
 
@@ -56,20 +59,21 @@ volatile int last_status = STATUS_IDLE;
 volatile int current_key = NO_KEY;
 volatile int last_key = NO_KEY;
 
-// Variables will change:
-
-// int buttonState;             // the current reading from the input pin
-
 boolean SERIAL_DEBUG = true;
-boolean welcome_beep = true;
-int relayState = LOW;         // the current state of the output pin
+boolean WELCOME_BEEP = true;
+int relayState = LOW;                                 // the current state of the output pin
 
+
+// Exposure parameters
 const int start_time = 8;
-
 volatile float baseTime = start_time * 1000.0;        // initial base time (ms)
 volatile float expTime = baseTime;
 volatile float prevExpTime = baseTime;
 volatile int baseStep = 1;
+float limitMillis = 0;
+float time_increase = 1000;                           // countdown interval (miliseconds)
+
+
 
 // LCD
 int ADDR = 0xA7;
@@ -79,22 +83,18 @@ byte c;
 
 LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
+// Buttons
 Button mode_btn = Button(PINS_BTN_status,PULLDOWN);
-
 Button incr_up_btn = Button(PINS_BTN_INCR_UP,PULLDOWN);
 Button ok_btn = Button(PINS_BTN_OK,PULLDOWN);
-// Button ok_btn = Button(PINS_BTN_OK,PULLDOWN);
-
 Button up_btn = Button(PINS_BTN_UP,PULLDOWN);
 Button down_btn = Button(PINS_BTN_DOWN,PULLDOWN);
-
 Button focus_btn = Button(PINS_BTN_FOCUS,PULLDOWN);
 Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
 
 Button keys[7] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn, incr_up_btn, ok_btn};
 
-float limitMillis = 0;
-float time_increase = 1000; // countdown interval (miliseconds)
+
 
 
 // el cálculo de la razón es 2 elevado a 1/3 para incrementos de 1/3
@@ -127,12 +127,16 @@ void setup() {
 
   // Welcome message and beeps  
   lcd.cursorTo(0,0);
-  lcd.printIn("DkroomDuino 0.1");
+  lcd.printIn("DkroomDuino ");
+  char c[2];
+  sprintf(c, "%01d.%01d", MAJOR_VERSION, MINOR_VERSION);
+  lcd.printIn(c); 
+
   lcd.cursorTo(2,0);
   lcd.printIn("Ready!");
   delay(1820);
 
-  if (welcome_beep) {
+  if (WELCOME_BEEP) {
     digitalWrite(BUZZER_PIN, HIGH);
     delay(40);
     digitalWrite(BUZZER_PIN, LOW);
@@ -154,69 +158,6 @@ void setup() {
   lcd.cursorTo(0,0);
   lcd.printIn(modeStrings[0]);
   LcdPrintTime(baseTime);
-}
-
-void scanKeyboard() {
-  if(focus_btn.uniquePress()){
-    
-    btn_click();
-    current_key = KEY_FOCUS;
-    // focus();
-    if (cur_status == STATUS_IDLE) {
-      cur_status = STATUS_FOCUS;
-    } else if (cur_status == STATUS_FOCUS ){
-      cur_status = STATUS_IDLE;
-    }
-  } else if (expose_btn.uniquePress()){
-    
-    btn_click();
-    current_key = KEY_EXPOSE;
-    if (cur_status == STATUS_IDLE) {
-      cur_status = STATUS_EXPOSE;
-    } else if (cur_status == STATUS_EXPOSE) {
-      // cancel
-      cur_status = STATUS_IDLE;
-      expTime = baseTime;
-      limitMillis = 0;
-    }
-  } else if(up_btn.uniquePress()){
-    
-    btn_click();
-    current_key = KEY_UP;
-    time_up();
-  } else if(down_btn.uniquePress()){
-    
-    btn_click();
-    current_key = KEY_DOWN;
-    time_down();
-  } else if(mode_btn.uniquePress()){
-    
-    btn_click();
-    current_key = KEY_MODE; 
-    if (cur_status == STATUS_IDLE) {
-      if (cur_mode < 1) {
-        cur_mode++;
-      } else {
-        cur_mode = 0;
-      }
-    }
-  } else if (incr_up_btn.uniquePress()) {
-    
-    btn_click();
-    current_key = KEY_INCR_UP;
-    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
-      incr_up();
-    }
-  } else if (ok_btn.uniquePress()) {
-    
-    btn_click();
-    current_key = KEY_OK;
-    /*
-    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
-      incr_down();
-    }
-    */
-  }
 }
 
 void loop() {
@@ -300,9 +241,6 @@ void loop() {
         prevExpTime = term;
       }
 
-      // no puedes sustituir baseTime, si no, no calcurá bien el 
-      // term. Hay que exponer usando otra variable y baseTime dejarla fija
-      // baseTime = term - baseTime;
     } else {
       // no es final, sigue el timer
       if (cur_mode == TEST_MODE) {
