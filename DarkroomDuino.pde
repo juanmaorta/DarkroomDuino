@@ -45,6 +45,8 @@ const int CLICK_LENGTH =  1;     // miliseconds for click audio feedback
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
 
+#define BUTTON_HOLD_TIME     150 // Time to hold up/down buttons to get multiple press
+
 // Execution statuses
 #define STATUS_IDLE     0 // No mode selected
 #define STATUS_FOCUS    1 // Focus

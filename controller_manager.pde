@@ -33,12 +33,10 @@ void scanKeyboard() {
       expTime = baseTime;
       limitMillis = 0;
     }
-  } else if(up_btn.uniquePress()){
-    
-    btn_click();
+  } else if(up_btn.isPressed()){
     current_key = KEY_UP;
     time_up();
-  } else if(down_btn.uniquePress()){
+  } else if(down_btn.isPressed()){
     
     btn_click();
     current_key = KEY_DOWN;
@@ -99,20 +97,50 @@ void focus() {
 }
 
 void time_up() {
+  static long lasttime;
+
+  if (millis() < lasttime) {
+     // we wrapped around, lets just try again
+     lasttime = millis();
+    
+  }
+  
+  if ((lasttime + BUTTON_HOLD_TIME) > millis()) {
+    // not enough time has passed to debounce
+    return; 
+  }
+  // ok we have waited DEBOUNCE milliseconds, lets reset the timer
+  lasttime = millis();
+
   if (baseStep == 1) {
     btn_click();
     if (baseTime < 100000.00) {
-      baseTime += 1000.00;
+      baseTime += 100.00;
       expTime = baseTime;
     }
   }
 }
 
 void time_down() {
+  static long lasttime;
+
+  if (millis() < lasttime) {
+     // we wrapped around, lets just try again
+     lasttime = millis();
+    
+  }
+  
+  if ((lasttime + BUTTON_HOLD_TIME) > millis()) {
+    // not enough time has passed to debounce
+    return; 
+  }
+  // ok we have waited DEBOUNCE milliseconds, lets reset the timer
+  lasttime = millis();
+
   if (baseStep == 1) {
     btn_click();
     if (baseTime > 1000.00) {
-      baseTime -= 1000.00;
+      baseTime -= 100.00;
       expTime = baseTime;
     }
   }
