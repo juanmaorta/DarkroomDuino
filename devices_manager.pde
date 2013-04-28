@@ -35,7 +35,7 @@ void LcdPrintTime(float millis) {
 void LcdPrintStep(int step) {
       lcd.cursorTo(2,0);
       char c[20];
-      sprintf(c, "t: %02d", step);
+      sprintf(c, "#%02d", step);
       lcd.printIn(c); 
 }
 

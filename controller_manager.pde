@@ -37,8 +37,6 @@ void scanKeyboard() {
     current_key = KEY_UP;
     time_up();
   } else if(down_btn.isPressed()){
-    
-    btn_click();
     current_key = KEY_DOWN;
     time_down();
   } else if(mode_btn.uniquePress()){
@@ -51,6 +49,9 @@ void scanKeyboard() {
       } else {
         cur_mode = 0;
       }
+    } else if (cur_status == STATUS_SELECT_INTERVAL){
+      cur_mode = 0;
+      cur_status = STATUS_IDLE;
     }
   } else if (incr_up_btn.uniquePress()) {
     
@@ -60,14 +61,11 @@ void scanKeyboard() {
       incr_up();
     }
   } else if (ok_btn.uniquePress()) {
-    
-    btn_click();
-    current_key = KEY_OK;
-    /*
-    if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
-      incr_down();
+    if (cur_status == STATUS_SELECT_INTERVAL || cur_status ==  STATUS_IDLE && cur_mode == TEST_MODE) {
+      if (baseStep > 1) { 
+        show_intervals();
+      }
     }
-    */
   }
 }
 
@@ -117,6 +115,7 @@ void time_up() {
     if (baseTime < 100000.00) {
       baseTime += 100.00;
       expTime = baseTime;
+      intervals[0] = baseTime;
     }
   }
 }
@@ -142,6 +141,7 @@ void time_down() {
     if (baseTime > 1000.00) {
       baseTime -= 100.00;
       expTime = baseTime;
+      intervals[0] = baseTime;
     }
   }
 }
@@ -166,6 +166,35 @@ void incr_up() {
 
 void incr_down() {
   btn_click();
+}
+
+void show_intervals() {
+  btn_click();
+  current_key = KEY_OK;
+
+  if (SERIAL_DEBUG) {
+    for (int i = 0; i < baseStep; i++) { 
+      if (i == current_displayed_interval) {
+        Serial.print("[x] "); 
+      } else {
+        Serial.print("[ ] "); 
+      }
+      Serial.print("step ");
+      Serial.print(i);
+      Serial.print(" :");
+      Serial.println(intervals[i]);
+
+    }
+    Serial.println(baseStep);
+    Serial.println(current_displayed_interval);
+  }
+ 
+  if (current_displayed_interval < baseStep - 2) {
+    current_displayed_interval ++;
+  } else {
+    current_displayed_interval = 0;
+  }
+  cur_status = STATUS_SELECT_INTERVAL;
 }
 
 float countdown(float seconds) {

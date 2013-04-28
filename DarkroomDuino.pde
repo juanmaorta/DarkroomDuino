@@ -48,13 +48,16 @@ const int CLICK_LENGTH =  1;     // miliseconds for click audio feedback
 #define BUTTON_HOLD_TIME     150 // Time to hold up/down buttons to get multiple press
 
 // Execution statuses
-#define STATUS_IDLE     0 // No mode selected
-#define STATUS_FOCUS    1 // Focus
-#define STATUS_EXPOSE   2 // Expose
+#define STATUS_IDLE             0 // No mode selected
+#define STATUS_FOCUS            1 // Focus
+#define STATUS_EXPOSE           2 // Expose
+#define STATUS_SELECT_INTERVAL  3 // Time interval selection (during TEST MODE)
+
 
 // Execution modes
-#define PRINT_MODE  0
-#define TEST_MODE   1
+#define PRINT_MODE            0
+#define TEST_MODE             1
+
 
 volatile int cur_status = STATUS_IDLE;
 volatile int last_status = STATUS_IDLE;
@@ -67,13 +70,16 @@ int relayState = LOW;                                 // the current state of th
 
 
 // Exposure parameters
-const int start_time = 8;
+const int start_time = 4;
 volatile float baseTime = start_time * 1000.0;        // initial base time (ms)
 volatile float expTime = baseTime;
 volatile float prevExpTime = baseTime;
 volatile int baseStep = 1;
 float limitMillis = 0;
 float time_increase = 1000;                           // countdown interval (miliseconds)
+float intervals[15] = {0};
+int num_intervals = 15;
+int current_displayed_interval = 0;
 
 
 
@@ -199,6 +205,10 @@ void loop() {
       baseStep = 1;
       expTime = baseTime;
       prevExpTime = baseTime;
+      for (int i = 0; i < num_intervals; i++) {
+        intervals[i] = 0;
+      }
+      current_displayed_interval = 0;
      } else {
       if (baseStep > 1) {
         // LcdPrintTime(expTime);
@@ -236,9 +246,17 @@ void loop() {
       digitalWrite(BUZZER_PIN, LOW);
 
       if (cur_mode == TEST_MODE) {
+        if (baseStep -2 >= 0) {
+          intervals[baseStep - 1] = expTime + intervals[baseStep - 2];
+        } else {
+          intervals[baseStep - 1] = expTime;
+        }
+
         baseStep ++;
         double term = getTerm((int)baseTime, factor, baseStep);
       
+         
+
         expTime = term - prevExpTime;
         prevExpTime = term;
       }
@@ -250,5 +268,13 @@ void loop() {
       }
       LcdPrintTime(finaltime);
     }
+  }
+
+  if (cur_status == STATUS_SELECT_INTERVAL) {
+    LcdPrintStep(current_displayed_interval + 1);
+    LcdPrintTime(intervals[current_displayed_interval]);
+    baseTime = intervals[current_displayed_interval];
+    lcd.cursorTo(0,0);
+    lcd.printIn("Select interval ");
   }
 }
