@@ -10,6 +10,8 @@
  
 // Runs the controller
 void controller_run(){}
+void set_expose_status() {}
+void cancel() {}
 
 void idle() {
    if (cur_status == STATUS_IDLE) {
@@ -27,12 +29,6 @@ void focus() {
         cur_status = STATUS_FOCUS;
         digitalWrite(RELAY_PIN,HIGH);
         relayState = HIGH;
-        // LcdClearLine(0);
-        
-        // lcd.cursorTo(2,0);
-        // lcd.printIn("Focus");
-        
-        // LcdClearLine(2);
       } else {
         cur_status = STATUS_IDLE;
         digitalWrite(RELAY_PIN,LOW);
