@@ -74,7 +74,8 @@ volatile float prevExpTime = baseTime;
 volatile int baseStep = 1;
 float limitMillis = 0;
 float time_increase = 1000;                           // countdown interval (miliseconds)
-float intervals[15] = {baseTime};
+float intervals[15] = {0};
+int num_intervals = 15;
 
 
 
@@ -200,6 +201,9 @@ void loop() {
       baseStep = 1;
       expTime = baseTime;
       prevExpTime = baseTime;
+      for (int i = 0; i < num_intervals; i++) {
+        intervals[i] = 0;
+      }
      } else {
       if (baseStep > 1) {
         // LcdPrintTime(expTime);
@@ -237,11 +241,16 @@ void loop() {
       digitalWrite(BUZZER_PIN, LOW);
 
       if (cur_mode == TEST_MODE) {
-       
+        if (baseStep -2 >= 0) {
+          intervals[baseStep - 1] = expTime + intervals[baseStep - 2];
+        } else {
+          intervals[baseStep - 1] = expTime;
+        }
+
         baseStep ++;
         double term = getTerm((int)baseTime, factor, baseStep);
       
-         intervals[baseStep - 1] = term;
+         
 
         expTime = term - prevExpTime;
         prevExpTime = term;
