@@ -49,6 +49,9 @@ void scanKeyboard() {
       } else {
         cur_mode = 0;
       }
+    } else if (cur_status == STATUS_SELECT_INTERVAL){
+      cur_mode = 0;
+      cur_status = STATUS_IDLE;
     }
   } else if (incr_up_btn.uniquePress()) {
     
@@ -58,8 +61,10 @@ void scanKeyboard() {
       incr_up();
     }
   } else if (ok_btn.uniquePress()) {
-    if (baseStep > 1) { 
-      show_intervals();
+    if (cur_status == STATUS_SELECT_INTERVAL || cur_status ==  STATUS_IDLE && cur_mode == TEST_MODE) {
+      if (baseStep > 1) { 
+        show_intervals();
+      }
     }
   }
 }
@@ -165,10 +170,8 @@ void incr_down() {
 
 void show_intervals() {
   btn_click();
-  
-  
-
   current_key = KEY_OK;
+
   if (SERIAL_DEBUG) {
     for (int i = 0; i < baseStep; i++) { 
       if (i == current_displayed_interval) {
@@ -182,14 +185,16 @@ void show_intervals() {
       Serial.println(intervals[i]);
 
     }
+    Serial.println(baseStep);
+    Serial.println(current_displayed_interval);
   }
-  Serial.println(baseStep);
-  Serial.println(current_displayed_interval);
+ 
   if (current_displayed_interval < baseStep - 2) {
     current_displayed_interval ++;
   } else {
     current_displayed_interval = 0;
   }
+  cur_status = STATUS_SELECT_INTERVAL;
 }
 
 float countdown(float seconds) {
