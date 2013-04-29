@@ -18,8 +18,8 @@
 #define PINS_BTN_UP               3  //(digital pin)
 #define PINS_BTN_DOWN             4  //(digital pin)
 
-#define PINS_BTN_FOCUS            7  //(digital pin)
-#define PINS_BTN_GO               8  //(digital pin)
+#define PINS_BTN_FOCUS            8  //(digital pin)
+#define PINS_BTN_GO               7  //(digital pin)
 
 
 int button_pins[5] = { PINS_BTN_UP, PINS_BTN_DOWN, PINS_BTN_status, PINS_BTN_FOCUS, PINS_BTN_GO };
@@ -70,7 +70,7 @@ int relayState = LOW;                                 // the current state of th
 
 
 // Exposure parameters
-const int start_time = 4;
+const int start_time = 8;
 volatile float baseTime = start_time * 1000.0;        // initial base time (ms)
 volatile float expTime = baseTime;
 volatile float prevExpTime = baseTime;
