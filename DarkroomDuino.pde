@@ -182,6 +182,9 @@ void setup() {
   down_btn.pressHandler(onPressDown);
   down_btn.holdHandler(onHoldDown, BUTTON_HOLD_TIME);
   down_btn.releaseHandler(onRelease);
+
+  ok_btn.releaseHandler(onOkBtnRelease);
+  ok_btn.holdHandler(onOkBtnHold, BUTTON_HOLD_TIME);
 }
 
 void onHoldUp(Button& b){
@@ -203,6 +206,23 @@ void onPressDown(Button& b) {
 void onRelease(Button& b) {
   up_hold = false;
   down_hold = false;
+}
+
+void onOkBtnRelease(Button& b) {
+  if (cur_status == STATUS_SELECT_INTERVAL || cur_status ==  STATUS_IDLE && cur_mode == TEST_MODE) {
+     if (baseStep > 1) { 
+       show_intervals();
+     }
+  }
+}
+
+void onOkBtnHold(Button& b) {
+  cur_status = STATUS_IDLE;
+  cur_mode = PRINT_MODE;
+  baseTime = intervals[current_displayed_interval];
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(400);
+  digitalWrite(BUZZER_PIN, LOW);
 }
 
 
@@ -312,7 +332,7 @@ void loop() {
   if (cur_status == STATUS_SELECT_INTERVAL) {
     LcdPrintStep(current_displayed_interval + 1);
     LcdPrintTime(intervals[current_displayed_interval]);
-    baseTime = intervals[current_displayed_interval];
+    // baseTime = intervals[current_displayed_interval];
     lcd.cursorTo(0,0);
     lcd.printIn("Select interval ");
   }

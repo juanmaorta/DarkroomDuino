@@ -13,6 +13,7 @@ void cancel() {}
 void scanKeyboard() {
   up_btn.process();
   down_btn.process();
+  ok_btn.process();
 
   if (up_btn.isPressed() && up_hold) {
     time_up();
@@ -70,12 +71,6 @@ void scanKeyboard() {
     current_key = KEY_INCR_UP;
     if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
       incr_up();
-    }
-  } else if (ok_btn.uniquePress()) {
-    if (cur_status == STATUS_SELECT_INTERVAL || cur_status ==  STATUS_IDLE && cur_mode == TEST_MODE) {
-      if (baseStep > 1) { 
-        show_intervals();
-      }
     }
   }
 }
