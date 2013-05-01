@@ -11,6 +11,18 @@ void set_expose_status() {}
 void cancel() {}
 
 void scanKeyboard() {
+  up_btn.process();
+  down_btn.process();
+  ok_btn.process();
+
+  if (up_btn.isPressed() && up_hold) {
+    time_up();
+  }
+
+  if (down_btn.isPressed() && down_hold) {
+    time_down();
+  }
+
   if(focus_btn.uniquePress()){
     
     btn_click();
@@ -33,12 +45,12 @@ void scanKeyboard() {
       expTime = baseTime;
       limitMillis = 0;
     }
-  } else if(up_btn.isPressed()){
-    current_key = KEY_UP;
-    time_up();
-  } else if(down_btn.isPressed()){
-    current_key = KEY_DOWN;
-    time_down();
+  // } else if(up_btn.uniquePress()){
+  //   current_key = KEY_UP;
+  //   time_up();
+  // } else if(down_btn.uniquePress()){
+  //   current_key = KEY_DOWN;
+  //   time_down();
   } else if(mode_btn.uniquePress()){
     
     btn_click();
@@ -59,12 +71,6 @@ void scanKeyboard() {
     current_key = KEY_INCR_UP;
     if (cur_status == STATUS_IDLE && cur_mode == TEST_MODE) {
       incr_up();
-    }
-  } else if (ok_btn.uniquePress()) {
-    if (cur_status == STATUS_SELECT_INTERVAL || cur_status ==  STATUS_IDLE && cur_mode == TEST_MODE) {
-      if (baseStep > 1) { 
-        show_intervals();
-      }
     }
   }
 }
@@ -95,6 +101,7 @@ void focus() {
 }
 
 void time_up() {
+  /*
   static long lasttime;
 
   if (millis() < lasttime) {
@@ -109,6 +116,7 @@ void time_up() {
   }
   // ok we have waited DEBOUNCE milliseconds, lets reset the timer
   lasttime = millis();
+  */
 
   if (baseStep == 1) {
     btn_click();
@@ -121,6 +129,7 @@ void time_up() {
 }
 
 void time_down() {
+  /*
   static long lasttime;
 
   if (millis() < lasttime) {
@@ -135,6 +144,7 @@ void time_down() {
   }
   // ok we have waited DEBOUNCE milliseconds, lets reset the timer
   lasttime = millis();
+  */
 
   if (baseStep == 1) {
     btn_click();
