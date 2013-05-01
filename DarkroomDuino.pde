@@ -112,8 +112,8 @@ Button keys[7] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn, incr_up_btn
 // el cálculo de la razón es 2 elevado a 1/3 para incrementos de 1/3
 
 // steps: 1, 1/2, 1/3
-double steps[5] = {2, 1.414213562, 1.25992105, 1.189207115, 1.122462048 };
-char* stepStrings[]={"1/1", "1/2", "1/3", "1/4", "1/6"};
+double steps[6] = {2, 1.414213562, 1.25992105, 1.189207115, 1.148698355, 1.122462048 };
+char* stepStrings[]={"1/1", "1/2", "1/3", "1/4", "1/5", "1/6"};
 
 int modes[] = {PRINT_MODE, TEST_MODE};
 char* modeStrings[] = {"Print     ","Test strip"};

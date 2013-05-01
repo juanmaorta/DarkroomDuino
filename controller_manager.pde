@@ -159,7 +159,7 @@ void time_down() {
 void incr_up() {
   if (baseStep == 1) {
     btn_click();
-    if (currentIncr < 4) {
+    if (currentIncr < 5) {
       currentIncr++;
     } else {
       currentIncr = 0;
