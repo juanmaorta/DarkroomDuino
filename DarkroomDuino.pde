@@ -1,6 +1,7 @@
 
-#include <MsTimer2.h>
 #include <Button.h>
+
+#include <MsTimer2.h>
 
 #include <Wire.h>
 #include <LCDI2C4Bit.h>
@@ -45,7 +46,7 @@ const int CLICK_LENGTH =  1;     // miliseconds for click audio feedback
 #define KEY_FOCUS            7 // Focus pressed
 #define KEY_EXPOSE           8 // Expose button pressed
 
-#define BUTTON_HOLD_TIME     150 // Time to hold up/down buttons to get multiple press
+#define BUTTON_HOLD_TIME     1000 // Time to hold up/down buttons to get multiple press
 
 // Execution statuses
 #define STATUS_IDLE             0 // No mode selected
@@ -63,6 +64,9 @@ volatile int cur_status = STATUS_IDLE;
 volatile int last_status = STATUS_IDLE;
 volatile int current_key = NO_KEY;
 volatile int last_key = NO_KEY;
+
+volatile boolean up_hold = false;
+volatile boolean down_hold = false;
 
 boolean SERIAL_DEBUG = true;
 boolean WELCOME_BEEP = true;
@@ -92,13 +96,13 @@ byte c;
 LCDI2C4Bit lcd = LCDI2C4Bit(ADDR,4,20);
 
 // Buttons
-Button mode_btn = Button(PINS_BTN_status,PULLDOWN);
-Button incr_up_btn = Button(PINS_BTN_INCR_UP,PULLDOWN);
-Button ok_btn = Button(PINS_BTN_OK,PULLDOWN);
-Button up_btn = Button(PINS_BTN_UP,PULLDOWN);
-Button down_btn = Button(PINS_BTN_DOWN,PULLDOWN);
-Button focus_btn = Button(PINS_BTN_FOCUS,PULLDOWN);
-Button expose_btn = Button(PINS_BTN_GO,PULLDOWN);
+Button mode_btn = Button(PINS_BTN_status,BUTTON_PULLDOWN);
+Button incr_up_btn = Button(PINS_BTN_INCR_UP,BUTTON_PULLDOWN);
+Button ok_btn = Button(PINS_BTN_OK,BUTTON_PULLDOWN);
+Button up_btn = Button(PINS_BTN_UP,BUTTON_PULLDOWN);
+Button down_btn = Button(PINS_BTN_DOWN,BUTTON_PULLDOWN);
+Button focus_btn = Button(PINS_BTN_FOCUS,BUTTON_PULLDOWN);
+Button expose_btn = Button(PINS_BTN_GO,BUTTON_PULLDOWN);
 
 Button keys[7] = {up_btn, down_btn, focus_btn, mode_btn, expose_btn, incr_up_btn, ok_btn};
 
@@ -166,9 +170,44 @@ void setup() {
   lcd.cursorTo(0,0);
   lcd.printIn(modeStrings[0]);
   LcdPrintTime(baseTime);
+
+  // buttons up/down can be held pressed
+  // up_btn.setHoldThreshold(1000);
+  // down_btn.setHoldThreshold(1000);
+
+  up_btn.pressHandler(onPressUp);
+  up_btn.holdHandler(onHoldUp, BUTTON_HOLD_TIME);
+  up_btn.releaseHandler(onRelease);
+
+  down_btn.pressHandler(onPressDown);
+  down_btn.holdHandler(onHoldDown, BUTTON_HOLD_TIME);
+  down_btn.releaseHandler(onRelease);
 }
 
+void onHoldUp(Button& b){
+  up_hold = true;
+}
+
+void onHoldDown(Button& b){
+  down_hold = true;
+}
+
+void onPressUp(Button& b) {
+  time_up();
+}
+
+void onPressDown(Button& b) {
+  time_down();
+}
+
+void onRelease(Button& b) {
+  up_hold = false;
+  down_hold = false;
+}
+
+
 void loop() {
+
   if (last_status != cur_status) {
     switch (cur_status) {
       case STATUS_FOCUS:
