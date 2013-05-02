@@ -217,8 +217,8 @@ void onOkBtnRelease(Button& b) {
 }
 
 void onOkBtnHold(Button& b) {
-  cur_status = STATUS_IDLE;
-  cur_mode = PRINT_MODE;
+  // cur_status = STATUS_IDLE;
+  // cur_mode = PRINT_MODE;
   baseTime = intervals[current_displayed_interval];
   digitalWrite(BUZZER_PIN, HIGH);
   delay(400);
