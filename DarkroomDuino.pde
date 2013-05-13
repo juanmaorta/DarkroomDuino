@@ -1,7 +1,8 @@
 
 #include <Button.h>
-
+#include <LedControl.h>
 #include <MsTimer2.h>
+
 
 #include <Wire.h>
 #include <LCDI2C4Bit.h>
@@ -21,6 +22,11 @@
 
 #define PINS_BTN_FOCUS            8  //(digital pin)
 #define PINS_BTN_GO               7  //(digital pin)
+
+// 7-segment PINS
+#define DATA_IN                   14 // Analog pin 0
+#define CLK_PIN                   9
+#define LOAD_PIN                  10
 
 
 int button_pins[5] = { PINS_BTN_UP, PINS_BTN_DOWN, PINS_BTN_status, PINS_BTN_FOCUS, PINS_BTN_GO };
@@ -126,7 +132,19 @@ volatile double factor = steps[currentIncr];
 // volatile char* lblIncr = stepStrings[currentIncr];
 
 
+LedControl lc = LedControl(DATA_IN,CLK_PIN,LOAD_PIN,1);
+
 void setup() {
+  // 7-segment display
+  lc.shutdown(0,false);
+  lc.setIntensity(0,5);
+  lc.clearDisplay(0);
+  
+  lc.setChar(0,0,8,false);
+  lc.setChar(0,1,8,true);
+  lc.setChar(0,2,8,false);
+  lc.setChar(0,3,8,false);
+
   Wire.begin(); // join i2c bus (address optional for master)
  
   // initialize output pins
@@ -162,6 +180,7 @@ void setup() {
      Serial.begin(115200); 
   }
   lcd.clear();
+  lc.clearDisplay(0);
 
   MsTimer2::set(50, scanKeyboard);
   MsTimer2::start();
