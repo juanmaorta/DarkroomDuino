@@ -127,7 +127,7 @@ int cur_mode = modes[0];
 int last_mode = cur_mode;
 
 
-volatile int currentIncr = 2;
+volatile int currentIncr = 3;
 volatile double factor = steps[currentIncr];
 // volatile char* lblIncr = stepStrings[currentIncr];
 
@@ -137,7 +137,7 @@ LedControl lc = LedControl(DATA_IN,CLK_PIN,LOAD_PIN,1);
 void setup() {
   // 7-segment display
   lc.shutdown(0,false);
-  lc.setIntensity(0,5);
+  lc.setIntensity(0,1);
   lc.clearDisplay(0);
   
   lc.setChar(0,0,8,false);
@@ -254,6 +254,7 @@ void loop() {
         lcd.clear();
         lcd.cursorTo(2,0);
         lcd.printIn("Focus");
+        lc.clearDisplay(0);
         break;
       case STATUS_EXPOSE:
         // digitalWrite(RELAY_PIN,HIGH);
@@ -316,11 +317,11 @@ void loop() {
       limitMillis = 0;
 
       digitalWrite(BUZZER_PIN, HIGH);
-      delay(40);
+      delay(20);
       digitalWrite(BUZZER_PIN, LOW);
-      delay(100);
+      delay(10);
       digitalWrite(BUZZER_PIN, HIGH);
-      delay(40);
+      delay(20);
       digitalWrite(BUZZER_PIN, LOW);
 
       if (cur_mode == TEST_MODE) {
