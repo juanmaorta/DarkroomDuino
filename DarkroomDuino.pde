@@ -289,7 +289,7 @@ void loop() {
   if (cur_status == STATUS_EXPOSE) {
     digitalWrite(RELAY_PIN,HIGH);
     // keeps timer
-    int finaltime = countdown(expTime);
+    long finaltime = countdown(expTime);
     if (finaltime == 0) {
       cur_status = STATUS_IDLE;
       digitalWrite(RELAY_PIN,LOW);
