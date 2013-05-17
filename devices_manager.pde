@@ -25,9 +25,9 @@ void LcdPrintTime(float millis) {
 
       lcd.cursorTo(2,7);
       char c[20];
-      // if (SERIAL_DEBUG) {
-      //   Serial.println( sprintf(c, "%02d.%02d sec", d1, d2));
-      // }
+      if (SERIAL_DEBUG) {
+        Serial.println( sprintf(c, "%02d.%02d sec", d1, d2));
+      }
       sprintf(c, "%02d.%02d sec", d1, d2);
       lcd.printIn(c); 
 }

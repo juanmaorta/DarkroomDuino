@@ -34,7 +34,7 @@ const int CLICK_LENGTH =  1;     // miliseconds for click audio feedback
 
 
 #define MAJOR_VERSION 0
-#define MINOR_VERSION 1
+#define MINOR_VERSION 2
 
 // Keycodes
 #define NO_KEY               0 // No keys pressed
@@ -321,10 +321,6 @@ void loop() {
       }
 
     } else {
-      // no es final, sigue el timer
-      if (cur_mode == TEST_MODE) {
-        LcdPrintStep(baseStep);
-      }
       LcdPrintTime(finaltime);
     }
   }
