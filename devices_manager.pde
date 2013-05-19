@@ -24,7 +24,7 @@ void LcdPrintTime(float millis) {
   int centena = 0;
   int decena = 0;
   int unidad = 0;
-  int decimal = trunc(f2 * 10);
+  // int decimal = (int)(f2 * 10);
 
 
   if (d1 > 99) {
@@ -51,7 +51,11 @@ void LcdPrintTime(float millis) {
     lc.setChar(0,2,' ',false);
   }
   lc.setChar(0,1,unidad,true);
-  lc.setChar(0,0,decimal,false);
+  
+  
+  char dtostrfbuffer[15];
+  dtostrf(f2,2, 1, dtostrfbuffer);
+  lc.setChar(0,0,dtostrfbuffer[2],false);
     
     /*
       

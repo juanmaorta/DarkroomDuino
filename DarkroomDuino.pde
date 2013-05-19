@@ -40,7 +40,7 @@ const int CLICK_LENGTH =  1;     // miliseconds for click audio feedback
 
 
 #define MAJOR_VERSION 0
-#define MINOR_VERSION 2
+#define MINOR_VERSION 3
 
 // Keycodes
 #define NO_KEY               0 // No keys pressed
@@ -137,7 +137,7 @@ LedControl lc = LedControl(DATA_IN,CLK_PIN,LOAD_PIN,1);
 void setup() {
   // 7-segment display
   lc.shutdown(0,false);
-  lc.setIntensity(0,1);
+  lc.setIntensity(0,4);
   lc.clearDisplay(0);
   
   lc.setChar(0,0,8,false);
