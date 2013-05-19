@@ -39,18 +39,20 @@ void scanKeyboard() {
     current_key = KEY_EXPOSE;
     if (cur_status == STATUS_IDLE) {
       cur_status = STATUS_EXPOSE;
+      
+    } else if (cur_status == STATUS_SELECT_INTERVAL) {
+      baseTime = intervals[current_displayed_interval];
+      digitalWrite(BUZZER_PIN, HIGH);
+      delay(400);
+      digitalWrite(BUZZER_PIN, LOW);
+      cur_status = STATUS_IDLE;
+      cur_mode = 0;
     } else if (cur_status == STATUS_EXPOSE) {
       // cancel
       cur_status = STATUS_IDLE;
       expTime = baseTime;
       limitMillis = 0;
     }
-  // } else if(up_btn.uniquePress()){
-  //   current_key = KEY_UP;
-  //   time_up();
-  // } else if(down_btn.uniquePress()){
-  //   current_key = KEY_DOWN;
-  //   time_down();
   } else if(mode_btn.uniquePress()){
     
     btn_click();

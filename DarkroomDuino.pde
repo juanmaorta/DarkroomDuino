@@ -203,7 +203,7 @@ void setup() {
   down_btn.releaseHandler(onRelease);
 
   ok_btn.releaseHandler(onOkBtnRelease);
-  ok_btn.holdHandler(onOkBtnHold, BUTTON_HOLD_TIME);
+  // ok_btn.holdHandler(onOkBtnHold, BUTTON_HOLD_TIME);
 }
 
 void onHoldUp(Button& b){
