@@ -45,10 +45,11 @@ void LcdPrintStep(int step) {
       float total = prevExpTime / 1000.00;
       
       char dtostrfbuffer[15];
-      dtostrf(total,4, 1, dtostrfbuffer);
+      dtostrf(total,5, 2, dtostrfbuffer);
       // Serial.println(dtostrfbuffer);
       lcd.printIn("total ");
       lcd.printIn(dtostrfbuffer);
+      lcd.printIn("\"");
 }
 
 void LcdPrintInc() {
