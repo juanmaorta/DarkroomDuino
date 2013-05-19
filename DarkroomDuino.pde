@@ -142,7 +142,7 @@ void setup() {
   
   lc.setChar(0,0,8,false);
   lc.setChar(0,1,8,true);
-  lc.setChar(0,2,8,false);
+  lc.setChar(0,2,8,true);
   lc.setChar(0,3,8,false);
 
   Wire.begin(); // join i2c bus (address optional for master)
