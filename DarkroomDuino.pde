@@ -350,6 +350,7 @@ void loop() {
     LcdPrintTime(intervals[current_displayed_interval]);
     // baseTime = intervals[current_displayed_interval];
     lcd.cursorTo(0,0);
-    lcd.printIn("Select interval ");
+    lcd.printIn("Select     ");
+    // LcdClearLine(2);
   }
 }

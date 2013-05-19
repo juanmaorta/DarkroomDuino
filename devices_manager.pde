@@ -75,10 +75,20 @@ void LcdPrintTime(float millis) {
 }
 
 void LcdPrintStep(int step) {
-      lcd.cursorTo(2,0);
+      lcd.cursorTo(0,13);
       char c[20];
-      sprintf(c, "step #%02d", step);
-      lcd.printIn(c); 
+      sprintf(c, "#%02d", step);
+      lcd.printIn(c);
+      
+      lcd.cursorTo(2,0);
+      
+      float total = prevExpTime / 1000.00;
+      
+      char dtostrfbuffer[15];
+      dtostrf(total,4, 1, dtostrfbuffer);
+      // Serial.println(dtostrfbuffer);
+      lcd.printIn("total ");
+      lcd.printIn(dtostrfbuffer);
 }
 
 void LcdPrintInc() {
